@@ -75,7 +75,7 @@ extern "C" {
 #endif /* FOR_BUILD */
 #endif /* HAVE_CONFIG_H */
 
-#if defined(__CYGWIN__) || defined(__MINGW32__)
+#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(_MSC_VER)
 #define WINDOWS
 
 #ifndef HAVE_SDKDDKVER_H
@@ -109,9 +109,9 @@ extern "C" {
 #include <windows.h>
 #endif /* WINDOWS */
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(_MSC_VER)
 #include <_mingw.h>
-#endif /* __MINGW32__ */
+#endif /* defined(__MINGW32__) && !defined(_MSC_VER) */
 
 /*
  * The (poorly named) macro "interface" is unfortunately defined within
@@ -348,6 +348,10 @@ mbsinit (const mbstate_t *ps) {
 #else /* WORDS_BIGENDIAN */
 #define CHARSET_ENDIAN_SUFFIX "LE"
 #endif /* WORDS_BIGENDIAN */
+
+#if !defined(SIZEOF_WCHAR_T_STR) && defined(_MSC_VER)
+#define SIZEOF_WCHAR_T_STR "2"
+#endif /* !defined(SIZEOF_WCHAR_T_STR) && defined(_MSC_VER) */
 
 #define WCHAR_CHARSET ("UCS-" SIZEOF_WCHAR_T_STR CHARSET_ENDIAN_SUFFIX)
 
