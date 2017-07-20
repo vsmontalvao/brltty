@@ -59,12 +59,8 @@ extern "C" {
 #endif /* BRLAPI_WIN32 */
 
 #ifdef _MSC_VER
-typedef __int64 uint64_t;
-typedef __int32 uint32_t;
-#define UINT64_C(x) (x ## Ui64)
-#define PRIx64 "I64x"
 typedef signed int ssize_t;
-#else /* _MSC_VER */
+#endif /* _MSC_VER */
 
 /* this is for uint*_t */
 #include <stdint.h>
@@ -73,7 +69,6 @@ typedef signed int ssize_t;
 #include <unistd.h>
 
 #include <inttypes.h> /* For PRIx64 */
-#endif /* _MSC_VER */
 
 #include <wchar.h>
 

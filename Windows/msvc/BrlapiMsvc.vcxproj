@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Headers\prologue.h" />
     <ClInclude Include="..\..\Programs\brlapi_common.h" />
+    <ClInclude Include="..\..\Programs\brlapi_keycodes.h" />
     <ClInclude Include="brlapi.h" />
     <ClInclude Include="brlapi_constants.h" />
     <ClInclude Include="brlapi_keytab.auto.h" />
