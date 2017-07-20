@@ -36,7 +36,7 @@
 #endif /* HAVE_LANGINFO_H */
 #endif /* __MINGW32__ */
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) || defined(_MSC_VER)
 #include <ws2tcpip.h>
 #include "win_pthread.h"
 
@@ -44,7 +44,7 @@
 
 #define syslog(level,fmt,...) fprintf(stderr,#level ": " fmt, ## __VA_ARGS__)
 
-#else /* __MINGW32__ */
+#elif /* defined(__MINGW32__) || defined(_MSC_VER) */
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
@@ -69,7 +69,7 @@
 #include <sys/time.h>
 #endif /* HAVE_SYS_SELECT_H */
 
-#endif /* __MINGW32__ */
+#endif /* defined(__MINGW32__) || defined(_MSC_VER) */
 
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
@@ -116,6 +116,7 @@
 static WSADATA wsadata;
 #endif /* __MINGW32__ */
 
+#ifndef _MSC_VER
 static void* GetProc(const char *library, const char *fun) {
   HMODULE module;
   void *ret;
@@ -142,6 +143,7 @@ static WIN_PROC_STUB(getaddrinfo);
 static WIN_PROC_STUB(freeaddrinfo);
 #define freeaddrinfo(res) freeaddrinfoProc(res)
 #endif /* __MINGW32__ */
+#endif /* _MSC_VER */
 #endif /* WINDOWS */
 
 /* We need to declare these as weak external references to determine at runtime 
@@ -387,7 +389,7 @@ again:
     }
 
     handle->altExpectedPacketType = expectedPacketType;
-    handle->altPacket = packet;
+    handle->altPacket = (unsigned char*) packet;
     handle->altSize = size;
     handle->altRes = &res;
     sem_init(&sem, 0, 0);
@@ -453,10 +455,13 @@ static int brlapi__writePacketWaitForAck(brlapi_handle_t *handle, brlapi_packetT
 /* Tries to connect to the given host. */
 static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
   char *host = NULL;
-  char *port;
+  char *port = NULL;
   SocketDescriptor sockfd = -1;
 
 #ifdef __MINGW32__
+#ifdef _MSC_VER
+	if (WSAStartup(MAKEWORD(1,1), &wsadata))
+#else /* _MSC_VER */
   if (WSAStartup(
 #ifdef HAVE_GETADDRINFO
 	  MAKEWORD(2,0),
@@ -464,6 +469,7 @@ static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
 	  MAKEWORD(1,1),
 #endif /* HAVE_GETADDRINFO */
 	  &wsadata))
+#endif /* _MSC_VER */
     return -1;
 #endif /* __MINGW32__ */
 
@@ -471,13 +477,17 @@ static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
 
 #if defined(PF_LOCAL)
   if (handle->addrfamily == PF_LOCAL) {
-    int lpath = strlen(BRLAPI_SOCKETPATH),lport;
-    lport = strlen(port);
+    int lpath = (int) strlen(BRLAPI_SOCKETPATH),lport;
+    lport = (int) strlen(port);
 
 #ifdef __MINGW32__
     {
       HANDLE pipefd;
-      char path[lpath+lport+1];
+#ifdef _MSC_VER
+	  char* path = (char *) malloc((lpath + lport + 1) * sizeof(*path));
+#else /* _MSC_VER */
+	  char path[lpath+lport+1];
+#endif /* _MSC_VER */
 
       memcpy(path, BRLAPI_SOCKETPATH, lpath);
       memcpy(path+lpath, port, lport+1);
@@ -494,6 +504,10 @@ static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
       }
 
       sockfd = (SocketDescriptor)pipefd;
+
+#ifdef _MSC_VER
+      free(path);
+#endif /* _MSC_VER */
     }
 #else /* __MINGW32__ */
     {
@@ -530,10 +544,10 @@ static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
   if (0) {} else {
 #endif /* PF_LOCAL */
 
-#ifdef __MINGW32__
-    if (CHECKGETPROC("ws2_32.dll",getaddrinfo)
-	&& CHECKGETPROC("ws2_32.dll",freeaddrinfo)) {
-#endif /* __MINGW32__ */
+#if defined(__MINGW32__) && !defined(_MSC_VER)
+		if (CHECKGETPROC("ws2_32.dll",getaddrinfo)
+			&& CHECKGETPROC("ws2_32.dll",freeaddrinfo)) {
+#endif /* defined(__MINGW32__) && !defined(_MSC_VER) */
 #if defined(HAVE_GETADDRINFO) || defined(__MINGW32__)
 
     struct addrinfo *res,*cur;
@@ -552,7 +566,7 @@ static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
     for(cur = res; cur; cur = cur->ai_next) {
       sockfd = socket(cur->ai_family, cur->ai_socktype, cur->ai_protocol);
       if (sockfd<0) continue;
-      if (connect(sockfd, cur->ai_addr, cur->ai_addrlen)<0) {
+      if (connect(sockfd, cur->ai_addr, (int) cur->ai_addrlen)<0) {
         closeSocketDescriptor(sockfd);
         continue;
       }
@@ -564,10 +578,12 @@ static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
       goto out;
     }
 
-#endif /* HAVE_GETADDRINFO */
-#ifdef __MINGW32__
-    } else {
-#endif /* __MINGW32__ */
+#endif /* defined(HAVE_GETADDRINFO) || defined(__MINGW32__) */
+#if defined(__MINGW32__) && !defined(_MSC_VER)
+		} else {
+#else /* defined(__MINGW32__) && !defined(_MSC_VER) */
+		{
+#endif /* defined(__MINGW32__) && !defined(_MSC_VER) */
 #if !defined(HAVE_GETADDRINFO) || defined(__MINGW32__)
 
     struct sockaddr_in addr;
@@ -575,11 +591,11 @@ static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
 
     memset(&addr,0,sizeof(addr));
     addr.sin_family = AF_INET;
-    if (!port)
-      addr.sin_port = htons(BRLAPI_SOCKETPORTNUM);
-    else {
+	if (!port)
+		addr.sin_port = htons(BRLAPI_SOCKETPORTNUM);
+	else {
       char *c;
-      addr.sin_port = htons(strtol(port, &c, 0));
+	  addr.sin_port = htons((u_short) strtol(port, &c, 0));
       if (*c) {
 	struct servent *se;
 	
@@ -631,7 +647,7 @@ static int tryHost(brlapi_handle_t *handle, char *hostAndPort) {
 
 #endif /* !HAVE_GETADDRINFO */
 #ifdef __MINGW32__
-    }
+		}
 #endif /* __MINGW32__ */
 
 #if defined(IPPROTO_TCP) && defined(TCP_NODELAY)
@@ -797,7 +813,7 @@ static int brlapi__getDriverSpecific(brlapi_handle_t *handle, const char *driver
   int res;
   brlapi_packet_t packet;
   brlapi_getDriverSpecificModePacket_t *driverPacket = &packet.getDriverSpecificMode;
-  unsigned int n = strlen(driver);
+  unsigned int n = (unsigned int) strlen(driver);
   if (n>BRLAPI_MAXNAMELENGTH) {
     brlapi_errno = BRLAPI_ERROR_INVALID_PARAMETER;
     return -1;
@@ -989,21 +1005,26 @@ static int getControllingTty(void)
   if ((env = getenv("CONTROLVT")) && sscanf(env, "%u", &tty) == 1) return tty;
 
 #ifdef WINDOWS
+#ifndef _MSC_VER
   if (CHECKGETPROC("kernel32.dll", GetConsoleWindow))
-    /* really good guess */
+  /* really good guess */
     if ((tty = (LONG_PTR) GetConsoleWindowProc())) return tty;
-  if ((tty = (LONG_PTR) GetActiveWindow()) || (tty = (LONG_PTR) GetFocus())) {
+#else /* _MSC_VER */
+  if ((tty = (int) (LONG_PTR) GetConsoleWindow())) return tty;
+#endif /* _MSC_VER */
+
+  if ((tty = (int) (LONG_PTR) GetActiveWindow()) || (tty = (int) (LONG_PTR) GetFocus())) {
     /* good guess, but need to get back up to parent window */
     HWND root = GetDesktopWindow();
     HWND tmp = (HWND) (LONG_PTR) tty;
     while (1) {
       tmp = GetParent(tmp);
       if (!tmp || tmp == root) return tty;
-      tty = (LONG_PTR) tmp;
+      tty = (int) (LONG_PTR) tmp;
     }
   }
   /* poor guess: assumes that focus is here */
-  if ((tty = (LONG_PTR) GetForegroundWindow())) return tty;
+  if ((tty = (int) (LONG_PTR) GetForegroundWindow())) return tty;
 #endif /* WINDOWS */
 
 #ifdef linux
@@ -1086,12 +1107,12 @@ int BRLAPI_STDCALL brlapi__enterTtyModeWithPath(brlapi_handle_t *handle, int *tt
     if (ttytreepathstop==ttytreepath) break;
   }
 
-  for (n=0; n<nttys; n++) *t++ = htonl(ttys[n]);
+  for (n=0; n<(unsigned int)nttys; n++) *t++ = htonl(ttys[n]);
   (*nbTtys)+=nttys;
 
   *nbTtys = htonl(*nbTtys);
   p = (unsigned char *) t;
-  if (driverName==NULL) n = 0; else n = strlen(driverName);
+  if (driverName==NULL) n = 0; else n = (unsigned int) strlen(driverName);
   if (n>BRLAPI_MAXNAMELENGTH) {
     brlapi_errno = BRLAPI_ERROR_INVALID_PARAMETER;
     return -1;
@@ -1158,12 +1179,12 @@ static size_t getCharset(void *buffer, int wide) {
   const char *locale = setlocale(LC_CTYPE, NULL);
 
   if (wide
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(_MSC_VER)
       && CHECKPROC("ntdll.dll", wcslen)
-#endif /* __MINGW32__ */
+#endif /* defined(__MINGW32__) && !defined(_MSC_VER) */
   ) {
     size_t length = strlen(WCHAR_CHARSET);
-    *p++ = length;
+    *p++ = (char) length;
     p = mempcpy(p, WCHAR_CHARSET, length);
   } else if (locale && strcmp(locale, "C")) {
     /* not default locale, tell charset to server */
@@ -1173,7 +1194,7 @@ static size_t getCharset(void *buffer, int wide) {
 
     if (CP) {
       size_t length = sprintf(p+1, "CP%u", CP);
-      *p++ = length;
+      *p++ = (char) length;
       p += length;
     }
 #elif defined(CODESET)
@@ -1190,8 +1211,13 @@ static size_t getCharset(void *buffer, int wide) {
 
 /* Function : brlapi_writeText */
 /* Writes a string to the braille display */
-static int brlapi___writeText(brlapi_handle_t *handle, int cursor, const void *str, int wide)
+static int brlapi___writeText(brlapi_handle_t *handle, int cursor, const void *strIn, int wide)
 {
+#ifdef _MSC_VER
+  const wchar_t* str = (const wchar_t*) strIn;
+#else /* _MSC_VER */
+  const void* str = strIn;
+#endif /* _MSC_VER */
   int dispSize = handle->brlx * handle->brly;
   unsigned int min;
   brlapi_packet_t packet;
@@ -1205,73 +1231,77 @@ static int brlapi___writeText(brlapi_handle_t *handle, int cursor, const void *s
   *((uint32_t *) p) = htonl(1); p += sizeof(uint32_t);
   *((uint32_t *) p) = htonl(dispSize); p += sizeof(uint32_t);
   if (str) {
-    uint32_t *size;
-    wa->flags |= BRLAPI_WF_TEXT;
-    size = (uint32_t *) p;
-    p += sizeof(*size);
-#if defined(__MINGW32__)
-    if (CHECKGETPROC("ntdll.dll", wcslen) && wide)
-      len = sizeof(wchar_t) * wcslenProc(str);
-#else /* __MINGW32__ */
-    if (wide)
+	  uint32_t *size;
+	  wa->flags |= BRLAPI_WF_TEXT;
+      size = (uint32_t *) p;
+	  p += sizeof(*size);
+#ifdef _MSC_VER
       len = sizeof(wchar_t) * wcslen(str);
-#endif /* __MINGW32__ */
-    else
-      len = strlen(str);
-    if (!wide && locale && strcmp(locale,"C")) {
-      mbstate_t ps;
-      size_t eaten;
-      unsigned i;
-      memset(&ps,0,sizeof(ps));
-      for (min=0;min<dispSize;min++) {
-	if (!*(char*)str)
-	  goto endcount;
-	eaten = mbrlen(str,len,&ps);
-	switch(eaten) {
-	  case (size_t)(-2):
-	    errno = EILSEQ;
-	    /* fall through */
-	  case (size_t)(-1):
-	    brlapi_libcerrno = errno;
-	    brlapi_errfun = "mbrlen";
-	    brlapi_errno = BRLAPI_ERROR_LIBCERR;
-	    return -1;
-	  case 0:
-	    goto endcount;
-	}
-	memcpy(p, str, eaten);
-	p += eaten;
-	str += eaten;
-	len -= eaten;
+#else /* _MSC_VER */
+#ifdef __MINGW32
+      if (CHECKGETPROC("ntdll.dll", wcslen) && wide)
+          len = sizeof(wchar_t) * wcslenProc(str);
+#else  /* __MINGW32 */
+      if (wide)
+          len = sizeof(wchar_t) * wcslen(str);
+#endif /* __MINGW32 */
+      else
+          len = strlen(str);
+#endif /* _MSC_VER */
+      if (!wide && locale && strcmp(locale,"C")) {
+          mbstate_t ps;
+          size_t eaten;
+          unsigned i;
+          memset(&ps,0,sizeof(ps));
+          for (min=0;min<(unsigned int)dispSize;min++) {
+              if (!*(char*)str)
+                  goto endcount;
+              eaten = mbrlen((char*)str,len,&ps);
+              switch(eaten) {
+              case (size_t)(-2):
+                  errno = EILSEQ;
+                  /* fall through */
+              case (size_t)(-1):
+				  brlapi_libcerrno = errno;
+				  brlapi_errfun = "mbrlen";
+				  brlapi_errno = BRLAPI_ERROR_LIBCERR;
+				  return -1;
+			  case 0:
+				  goto endcount;
+			  }
+			  memcpy(p, str, eaten);
+			  p += eaten;
+			  str += eaten;
+			  len -= eaten;
+		  }
+      endcount:
+          for (i = min; i < (unsigned int) dispSize; i++) p += wcrtomb((char *)p, L' ', &ps);
+      } else if (wide) {
+          int extra;
+          min = (unsigned int) MIN(len, sizeof(wchar_t) * dispSize);
+          extra = dispSize - min / sizeof(wchar_t);
+          memcpy(p, str, min);
+          p += min;
+          wmemset((wchar_t *)p, L' ', extra);
+          p += sizeof(wchar_t) * extra;
+      } else {
+          min = (unsigned int) MIN(len, dispSize);
+          memcpy(p, str, min);
+          p += min;
+          memset(p, ' ', dispSize-min);
+          p += dispSize-min;
       }
-endcount:
-      for (i = min; i<dispSize; i++) p += wcrtomb((char *)p, L' ', &ps);
-    } else if (wide) {
-      int extra;
-      min = MIN(len, sizeof(wchar_t) * dispSize);
-      extra = dispSize - min / sizeof(wchar_t);
-      memcpy(p, str, min);
-      p += min;
-      wmemset((wchar_t *) p, L' ', extra);
-      p += sizeof(wchar_t) * extra;
-    } else {
-      min = MIN(len, dispSize);
-      memcpy(p, str, min);
-      p += min;
-      memset(p, ' ', dispSize-min);
-      p += dispSize-min;
-    }
-    *size = htonl((p-(unsigned char *)(size+1)));
+      *size = htonl((u_long)(p-(unsigned char *)(size+1)));
   }
   if (cursor!=BRLAPI_CURSOR_LEAVE) {
-    wa->flags |= BRLAPI_WF_CURSOR;
-    *((uint32_t *) p) = htonl(cursor);
-    p += sizeof(uint32_t);
+      wa->flags |= BRLAPI_WF_CURSOR;
+      *((uint32_t *) p) = htonl(cursor);
+      p += sizeof(uint32_t);
   }
 
   if ((len = getCharset(p , wide))) {
-    wa->flags |= BRLAPI_WF_CHARSET;
-    p += len;
+	  wa->flags |= BRLAPI_WF_CHARSET;
+	  p += len;
   }
 
   wa->flags = htonl(wa->flags);
@@ -1325,8 +1355,16 @@ int BRLAPI_STDCALL brlapi__writeDots(brlapi_handle_t *handle, const unsigned cha
     return -1;
   }
   {
+
+#ifdef _MSC_VER
+    char* text = (char*) malloc((size + 1) * sizeof(*text));
+    unsigned char* andMask = (unsigned char*) malloc(size * sizeof(*andMask));
+    unsigned char* orMask = (unsigned char*) malloc(size * sizeof(*orMask));
+#else /* _MSC_VER */
     char text[size+1];
     unsigned char andMask[size], orMask[size];
+#endif /* _MSC_VER */
+
     memset(text, ' ', size);
     text[size] = 0;
     wa.regionBegin = 1;
@@ -1338,6 +1376,12 @@ int BRLAPI_STDCALL brlapi__writeDots(brlapi_handle_t *handle, const unsigned cha
     wa.andMask = andMask;
     wa.cursor = 0;
     res = brlapi__write(handle,&wa);
+
+#ifdef _MSC_VER
+    free(text);
+    free(andMask);
+    free(orMask);
+#endif /* _MSC_VER */
   }
   return res;
 }
@@ -1356,7 +1400,8 @@ int brlapi__write(brlapi_handle_t *handle, const brlapi_writeArguments_t *s)
 #endif /* WINDOWS */
 {
   int dispSize = handle->brlx * handle->brly;
-  unsigned int rbeg, rsiz, strLen;
+  unsigned int rbeg, rsiz;
+  size_t strLen;
   brlapi_packet_t packet;
   brlapi_writeArgumentsPacket_t *wa = &packet.writeArguments;
   unsigned char *p = &wa->data;
@@ -1382,7 +1427,7 @@ int brlapi__write(brlapi_handle_t *handle, const brlapi_writeArguments_t *s)
     if (s->textSize != -1)
       strLen = s->textSize;
     else
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(_MSC_VER)
       if (wide)
 	strLen = sizeof(wchar_t) * wcslen((wchar_t *) s->text);
       else
@@ -1392,7 +1437,7 @@ int brlapi__write(brlapi_handle_t *handle, const brlapi_writeArguments_t *s)
       else
 #endif /* windows wide string length */
 	strLen = strlen(s->text);
-    *((uint32_t *) p) = htonl(strLen); p += sizeof(uint32_t);
+    *((uint32_t *) p) = htonl((u_long) strLen); p += sizeof(uint32_t);
     wa->flags |= BRLAPI_WF_TEXT;
     if (p + strLen > end) {
       brlapi_errno = BRLAPI_ERROR_INVALID_PARAMETER;
@@ -1439,7 +1484,7 @@ int brlapi__write(brlapi_handle_t *handle, const brlapi_writeArguments_t *s)
       }
     } else {
       strLen = strlen(s->charset);
-      *p++ = strLen;
+      *p++ = (unsigned char) strLen;
       wa->flags |= BRLAPI_WF_CHARSET;
       if (p + strLen > end) {
 	brlapi_errno = BRLAPI_ERROR_INVALID_PARAMETER;
@@ -1495,7 +1540,7 @@ static int packetReady(brlapi_handle_t *handle)
   memset(&timeout, 0, sizeof(timeout));
   FD_ZERO(&set);
   FD_SET(fd, &set);
-  return select(fd+1, &set, NULL, NULL, &timeout);
+  return select((int)(fd+1), &set, NULL, NULL, &timeout);
 #ifdef __MINGW32__
   }
 #endif /* __MINGW32__ */
@@ -1602,7 +1647,7 @@ brlapi_expandKeyCode (brlapi_keyCode_t keyCode, brlapi_expandedKeyCode_t *ekc) {
     brlapi_keyCode_t type = keyCode & BRLAPI_KEY_TYPE_MASK;
     brlapi_keyCode_t code = keyCode & BRLAPI_KEY_CODE_MASK;
 
-    ekc->type = type;
+    ekc->type = (unsigned int) type;
     ekc->command = (code & ~argumentMask);
     ekc->argument = code & argumentMask;
     ekc->flags = (keyCode & BRLAPI_KEY_FLAGS_MASK) >> BRLAPI_KEY_FLAGS_SHIFT;
@@ -1704,23 +1749,49 @@ done:
 /* what = 0 for ignoring !0 for unignoring */
 static int ignore_accept_key_ranges(brlapi_handle_t *handle, int what, brlapi_range_t ranges[], unsigned int n)
 {
-  uint32_t ints[n][4];
   unsigned int i, remaining, todo;
-
-  for (i=0; i<n; i++) {
-    ints[i][0] = htonl(ranges[i].first >> 32);
-    ints[i][1] = htonl(ranges[i].first & 0xffffffff);
-    ints[i][2] = htonl(ranges[i].last >> 32);
-    ints[i][3] = htonl(ranges[i].last & 0xffffffff);
+#ifdef _MSC_VER
+  uint32_t* ints = (uint32_t*) malloc(n * 4 * sizeof(*ints));
+  for (i = 0; i<n; i++) {
+    ints[i*4 + 0] = htonl(ranges[i].first >> 32);
+    ints[i*4 + 1] = htonl(ranges[i].first & 0xffffffff);
+    ints[i*4 + 2] = htonl(ranges[i].last >> 32);
+    ints[i*4 + 3] = htonl(ranges[i].last & 0xffffffff);
   };
+#else /* _MSC_VER */
+  uint32_t ints[n][4];
+  for (i=0; i<n; i++) {
+      ints[i][0] = htonl(ranges[i].first >> 32);
+      ints[i][1] = htonl(ranges[i].first & 0xffffffff);
+      ints[i][2] = htonl(ranges[i].last >> 32);
+      ints[i][3] = htonl(ranges[i].last & 0xffffffff);
+  };
+#endif /* _MSC_VER */
 
   for (remaining = n; remaining; remaining -= todo) {
     todo = remaining;
     if (todo > BRLAPI_MAXPACKETSIZE / (2*sizeof(brlapi_keyCode_t)))
       todo = BRLAPI_MAXPACKETSIZE / (2*sizeof(brlapi_keyCode_t));
-    if (brlapi__writePacketWaitForAck(handle,(what ? BRLAPI_PACKET_ACCEPTKEYRANGES : BRLAPI_PACKET_IGNOREKEYRANGES),&ints[n-remaining],todo*2*sizeof(brlapi_keyCode_t)))
+    if (brlapi__writePacketWaitForAck(
+          handle,
+          (what ? BRLAPI_PACKET_ACCEPTKEYRANGES : BRLAPI_PACKET_IGNOREKEYRANGES),
+#ifdef _MSC_VER
+          &ints[4 * (n - remaining)],
+#else /* _MSC_VER */
+          &ints[n - remaining],
+#endif /* _MSC_VER */
+          todo * 2 * sizeof(brlapi_keyCode_t)))
+    {
+#ifdef _MSC_VER
+      free(ints);
+#endif /* _MSC_VER */
       return -1;
+    }
   }
+
+#ifdef _MSC_VER
+  free(ints);
+#endif /* _MSC_VER */
   return 0;
 }
 
@@ -1737,7 +1808,12 @@ static int ignore_accept_keys(brlapi_handle_t *handle, int what, brlapi_rangeTyp
     brlapi_range_t range = { .first = 0, .last = BRLAPI_KEY_MAX };
     return ignore_accept_key_ranges(handle, what, &range, 1);
   } else {
+
+#ifdef _MSC_VER
+    brlapi_range_t* ranges = (brlapi_range_t*) malloc(n * sizeof(*ranges));
+#else /* _MSC_VER */
     brlapi_range_t ranges[n];
+#endif /* _MSC_VER */
     unsigned int i;
     brlapi_keyCode_t mask;
 
@@ -1751,7 +1827,14 @@ static int ignore_accept_keys(brlapi_handle_t *handle, int what, brlapi_rangeTyp
       ranges[i].first = code[i];
       ranges[i].last = code[i] | mask;
     }
+
+#ifdef _MSC_VER
+    int result = ignore_accept_key_ranges(handle, what, ranges, n);
+    free(ranges);
+    return result;
+#else /* _MSC_VER */
     return ignore_accept_key_ranges(handle, what, ranges, n);
+#endif /* _MSC_VER */
   }
 }
 
@@ -1941,16 +2024,24 @@ brlapi_exceptionHandler_t BRLAPI_STDCALL brlapi_setExceptionHandler(brlapi_excep
 int BRLAPI_STDCALL brlapi__strexception(brlapi_handle_t *handle, char *buf, size_t n, int err, brlapi_packetType_t type, const void *packet, size_t size)
 {
   int chars = 16; /* Number of bytes to dump */
+#ifdef _MSC_VER
+  char* hexString = (char*) malloc((3 * chars + 1) * sizeof(*hexString));
+#else /* _MSC_VER */
   char hexString[3*chars+1];
-  int i, nbChars = MIN(chars, size);
+#endif /* _MSC_VER */
+  size_t i, nbChars = MIN(chars, size);
   char *p = hexString;
   brlapi_error_t error = { .brlerrno = err };
   for (i=0; i<nbChars; i++)
     p += sprintf(p, "%02x ", ((unsigned char *) packet)[i]);
   p--; /* Don't keep last space */
   *p = '\0';
-  return snprintf(buf, n, "%s on %s request of size %d (%s)",
-    brlapi_strerror(&error), brlapi_getPacketTypeName(type), (int)size, hexString);
+  int result = snprintf(buf, n, "%s on %s request of size %d (%s)",
+      brlapi_strerror(&error), brlapi_getPacketTypeName(type), (int)size, hexString);
+#ifdef _MSC_VER
+  free(hexString);
+#endif /* _MSC_VER */
+  return result;
 }
 
 int BRLAPI_STDCALL brlapi_strexception(char *buf, size_t n, int err, brlapi_packetType_t type, const void *packet, size_t size)
