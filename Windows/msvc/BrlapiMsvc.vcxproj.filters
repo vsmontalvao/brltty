@@ -35,6 +35,9 @@
     <ClInclude Include="brlapi_constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Programs\brlapi_keycodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="brlapi.def">
