@@ -74,7 +74,7 @@ static ssize_t brlapi_writeFile(brlapi_fileDescriptor fd, const void *buffer, si
   for (n=0;n<size;n+=res) {
 #ifdef __MINGW32__
     OVERLAPPED overl = {0, 0, {{0, 0}}, CreateEvent(NULL, TRUE, FALSE, NULL)};
-    if ((!WriteFile(fd,buf+n,size-n,&res,&overl)
+    if ((!WriteFile(fd,buf+n, (DWORD)(size-n),&res,&overl)
       && GetLastError() != ERROR_IO_PENDING) ||
       !GetOverlappedResult(fd, &overl, &res, TRUE)) {
       res = GetLastError();
@@ -95,7 +95,7 @@ static ssize_t brlapi_writeFile(brlapi_fileDescriptor fd, const void *buffer, si
     }
 #endif /* __MINGW32__ */
   }
-  return n;
+  return (ssize_t) n;
 }
 
 /* brlapi_readFile */
@@ -112,12 +112,12 @@ static ssize_t brlapi_readFile(brlapi_fileDescriptor fd, void *buffer, size_t si
   for (n=0;n<size && res>=0;n+=res) {
 #ifdef __MINGW32__
     OVERLAPPED overl = {0, 0, {{0, 0}}, CreateEvent(NULL, TRUE, FALSE, NULL)};
-    if ((!ReadFile(fd,buf+n,size-n,&res,&overl)
+    if ((!ReadFile(fd,buf+n, (DWORD)(size-n),&res,&overl)
       && GetLastError() != ERROR_IO_PENDING) ||
       !GetOverlappedResult(fd, &overl, &res, TRUE)) {
       res = GetLastError();
       CloseHandle(overl.hEvent);
-      if (res == ERROR_HANDLE_EOF) return n;
+      if (res == ERROR_HANDLE_EOF) return (ssize_t) n;
       setErrno(res);
       return -1;
     }
@@ -140,21 +140,21 @@ static ssize_t brlapi_readFile(brlapi_fileDescriptor fd, void *buffer, size_t si
       /* Unexpected end of file ! */
       break;
   }
-  return n;
+  return (ssize_t) n;
 }
 
 /* brlapi_writePacket */
 /* Write a packet on the socket */
 ssize_t BRLAPI(writePacket)(brlapi_fileDescriptor fd, brlapi_packetType_t type, const void *buf, size_t size)
 {
-  uint32_t header[2] = { htonl(size), htonl(type) };
-  ssize_t res;
+	uint32_t header[2] = { htonl((u_long) size), htonl((u_long) type) };
+	ssize_t res;
 
-  /* first send packet header (size+type) */
+	/* first send packet header (size+type) */
   if ((res=brlapi_writeFile(fd,&header[0],sizeof(header)))<0) {
-    LibcError("write in writePacket");
-    return res;
-  }
+		LibcError("write in writePacket");
+		return res;
+	}
 
   /* eventually data */
   if (size && buf)
@@ -209,7 +209,7 @@ ssize_t BRLAPI(readPacketContent)(brlapi_fileDescriptor fd, size_t packetSize, v
       brlapi_readFile(fd,foo,sizeof(foo),1);
     brlapi_readFile(fd,foo,discard % sizeof(foo),1);
   }
-  return packetSize;
+  return (ssize_t) packetSize;
 
 out:
   LibcError("read in brlapi_readPacket");
@@ -251,7 +251,11 @@ static int BRLAPI(loadAuthKey)(const char *filename, size_t *authlength, void *a
 
   stsize = MIN(statbuf.st_size, BRLAPI_MAXPACKETSIZE-2*sizeof(uint32_t));
 
+#ifdef _MSC_VER
+  if ((fd = _open(filename, O_RDONLY)) <0) {
+#else /* _MSC_VER */
   if ((fd = open(filename, O_RDONLY)) <0) {
+#endif /* _MSC_VER */
     LibcError("open in loadAuthKey");
     return -1;
   }
@@ -266,11 +270,22 @@ static int BRLAPI(loadAuthKey)(const char *filename, size_t *authlength, void *a
 
   if (*authlength!=(size_t)stsize) {
     LibcError("read in loadAuthKey");
-    close(fd);
+
+#ifdef _MSC_VER
+	_close(fd);
+#else /* _MSC_VER */
+	close(fd);
+#endif /* _MSC_VER */
+
     return -1;
   }
 
+#ifdef _MSC_VER
+  _close(fd);
+#else /* _MSC_VER */
   close(fd);
+#endif /* _MSC_VER */
+
   return 0;
 }
 
@@ -281,7 +296,13 @@ static int BRLAPI(expandHost)(const char *hostAndPort, char **host, char **port)
   if (!hostAndPort || !*hostAndPort) {
 #if defined(PF_LOCAL)
     *host = NULL;
-    *port = strdup("0");
+
+#ifdef _MSC_VER
+    *port = _strdup("0");
+#else /* _MSC_VER */
+	*port = strdup("0");
+#endif /* _MSC_VER */
+
     return PF_LOCAL;
 #else /* PF_LOCAL */
     *host = strdup("127.0.0.1");
@@ -301,7 +322,13 @@ static int BRLAPI(expandHost)(const char *hostAndPort, char **host, char **port)
     } else {
 #if defined(PF_LOCAL)
       *host = NULL;
-      *port = strdup(c+1);
+
+#ifdef _MSC_VER
+      *port = _strdup(c + 1);
+#else /* _MSC_VER */
+      *port = strdup(c + 1);
+#endif /* _MSC_VER */
+
       return PF_LOCAL;
 #else /* PF_LOCAL */
       int porti = atoi(c+1);
@@ -313,8 +340,14 @@ static int BRLAPI(expandHost)(const char *hostAndPort, char **host, char **port)
 #endif /* PF_LOCAL */
     }
   } else {
-    *host = strdup(hostAndPort);
-    *port = strdup(BRLAPI_SOCKETPORT);
+
+#ifdef _MSC_VER
+	*host = _strdup(hostAndPort);
+	*port = _strdup(BRLAPI_SOCKETPORT);
+#else /* _MSC_VER */
+	*host = strdup(hostAndPort);
+	*port = strdup(BRLAPI_SOCKETPORT);
+#endif /* _MSC_VER */
     return PF_UNSPEC;
   }
 }
@@ -430,7 +463,13 @@ BRLAPI(getKeyFile)(const char *auth)
     if (path) path+=9;
     else path=auth;
   }
+
+#ifdef _MSC_VER
+  ret=_strdup(path);
+#else /* _MSC_VER */
   ret=strdup(path);
+#endif /* _MSC_VER */
+
   delim=strchr(ret,'+');
   if (delim)
     *delim = 0;
