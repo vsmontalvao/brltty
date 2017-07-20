@@ -23,10 +23,16 @@
     <ClInclude Include="..\..\Programs\brlapi_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Programs\brlapi.h">
+    <ClInclude Include="..\..\Headers\prologue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Headers\prologue.h">
+    <ClInclude Include="brlapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="brlapi_keytab.auto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="brlapi_constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

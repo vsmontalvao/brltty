@@ -143,7 +143,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Headers\prologue.h" />
-    <ClInclude Include="..\..\Programs\brlapi.h" />
     <ClInclude Include="..\..\Programs\brlapi_common.h" />
     <ClInclude Include="brlapi.h" />
     <ClInclude Include="brlapi_constants.h" />
