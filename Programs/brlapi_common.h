@@ -35,6 +35,12 @@
 #include <arpa/inet.h>
 #endif /* __MINGW32__ */
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#define open _open
+#define close _close
+#endif /* _MSC_VER */
+
 #if !defined(AF_LOCAL) && defined(AF_UNIX)
 #define AF_LOCAL AF_UNIX
 #endif /* !defined(AF_LOCAL) && defined(AF_UNIX) */
@@ -251,11 +257,7 @@ static int BRLAPI(loadAuthKey)(const char *filename, size_t *authlength, void *a
 
   stsize = MIN(statbuf.st_size, BRLAPI_MAXPACKETSIZE-2*sizeof(uint32_t));
 
-#ifdef _MSC_VER
-  if ((fd = _open(filename, O_RDONLY)) <0) {
-#else /* _MSC_VER */
   if ((fd = open(filename, O_RDONLY)) <0) {
-#endif /* _MSC_VER */
     LibcError("open in loadAuthKey");
     return -1;
   }
@@ -270,22 +272,11 @@ static int BRLAPI(loadAuthKey)(const char *filename, size_t *authlength, void *a
 
   if (*authlength!=(size_t)stsize) {
     LibcError("read in loadAuthKey");
-
-#ifdef _MSC_VER
-	_close(fd);
-#else /* _MSC_VER */
-	close(fd);
-#endif /* _MSC_VER */
-
+    close(fd);
     return -1;
   }
 
-#ifdef _MSC_VER
-  _close(fd);
-#else /* _MSC_VER */
   close(fd);
-#endif /* _MSC_VER */
-
   return 0;
 }
 
@@ -296,13 +287,7 @@ static int BRLAPI(expandHost)(const char *hostAndPort, char **host, char **port)
   if (!hostAndPort || !*hostAndPort) {
 #if defined(PF_LOCAL)
     *host = NULL;
-
-#ifdef _MSC_VER
-    *port = _strdup("0");
-#else /* _MSC_VER */
 	*port = strdup("0");
-#endif /* _MSC_VER */
-
     return PF_LOCAL;
 #else /* PF_LOCAL */
     *host = strdup("127.0.0.1");
@@ -322,13 +307,7 @@ static int BRLAPI(expandHost)(const char *hostAndPort, char **host, char **port)
     } else {
 #if defined(PF_LOCAL)
       *host = NULL;
-
-#ifdef _MSC_VER
-      *port = _strdup(c + 1);
-#else /* _MSC_VER */
-      *port = strdup(c + 1);
-#endif /* _MSC_VER */
-
+      *port = strdup(c+1);
       return PF_LOCAL;
 #else /* PF_LOCAL */
       int porti = atoi(c+1);
@@ -340,14 +319,8 @@ static int BRLAPI(expandHost)(const char *hostAndPort, char **host, char **port)
 #endif /* PF_LOCAL */
     }
   } else {
-
-#ifdef _MSC_VER
-	*host = _strdup(hostAndPort);
-	*port = _strdup(BRLAPI_SOCKETPORT);
-#else /* _MSC_VER */
 	*host = strdup(hostAndPort);
 	*port = strdup(BRLAPI_SOCKETPORT);
-#endif /* _MSC_VER */
     return PF_UNSPEC;
   }
 }
@@ -463,13 +436,7 @@ BRLAPI(getKeyFile)(const char *auth)
     if (path) path+=9;
     else path=auth;
   }
-
-#ifdef _MSC_VER
-  ret=_strdup(path);
-#else /* _MSC_VER */
   ret=strdup(path);
-#endif /* _MSC_VER */
-
   delim=strchr(ret,'+');
   if (delim)
     *delim = 0;
