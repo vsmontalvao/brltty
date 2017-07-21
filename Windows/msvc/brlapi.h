@@ -58,15 +58,15 @@ extern "C" {
 #define BRLAPI_STDCALL
 #endif /* BRLAPI_WIN32 */
 
-#ifdef _MSC_VER
-typedef signed int ssize_t;
-#endif /* _MSC_VER */
-
 /* this is for uint*_t */
 #include <stdint.h>
 
+#ifdef _MSC_VER
+typedef signed int ssize_t;
+#else /* _MSC_VER */
 /* NULL is defined there */
 #include <unistd.h>
+#endif /* _MSC_VER */
 
 #include <inttypes.h> /* For PRIx64 */
 
