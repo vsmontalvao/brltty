@@ -962,7 +962,7 @@ static ssize_t brlapi__request(brlapi_handle_t *handle, brlapi_packetType_t requ
 int BRLAPI_STDCALL brlapi__getDriverName(brlapi_handle_t *handle, char *name, size_t n)
 {
   ssize_t res = brlapi__request(handle, BRLAPI_PACKET_GETDRIVERNAME, name, n);
-  if ((res>0) && (res<=n)) name[res-1] = '\0';
+  if ((res>0) && (res<=(ssize_t)n)) name[res-1] = '\0';
   return res;
 }
 
@@ -1285,7 +1285,7 @@ static int brlapi___writeText(brlapi_handle_t *handle, int cursor, const void *s
           wmemset((wchar_t *)p, L' ', extra);
           p += sizeof(wchar_t) * extra;
       } else {
-          min = (unsigned int) MIN(len, dispSize);
+          min = MIN(len, (unsigned int) dispSize);
           memcpy(p, str, min);
           p += min;
           memset(p, ' ', dispSize-min);
@@ -2029,7 +2029,7 @@ int BRLAPI_STDCALL brlapi__strexception(brlapi_handle_t *handle, char *buf, size
 #else /* _MSC_VER */
   char hexString[3*chars+1];
 #endif /* _MSC_VER */
-  size_t i, nbChars = MIN(chars, size);
+  size_t i, nbChars = MIN((size_t) chars, size);
   char *p = hexString;
   brlapi_error_t error = { .brlerrno = err };
   for (i=0; i<nbChars; i++)
