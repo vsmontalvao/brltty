@@ -35,6 +35,12 @@
 #include <arpa/inet.h>
 #endif /* __MINGW32__ */
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#define open _open
+#define close _close
+#endif /* _MSC_VER */
+
 #if !defined(AF_LOCAL) && defined(AF_UNIX)
 #define AF_LOCAL AF_UNIX
 #endif /* !defined(AF_LOCAL) && defined(AF_UNIX) */
@@ -74,7 +80,7 @@ static ssize_t brlapi_writeFile(brlapi_fileDescriptor fd, const void *buffer, si
   for (n=0;n<size;n+=res) {
 #ifdef __MINGW32__
     OVERLAPPED overl = {0, 0, {{0, 0}}, CreateEvent(NULL, TRUE, FALSE, NULL)};
-    if ((!WriteFile(fd,buf+n,size-n,&res,&overl)
+    if ((!WriteFile(fd,buf+n, (DWORD)(size-n),&res,&overl)
       && GetLastError() != ERROR_IO_PENDING) ||
       !GetOverlappedResult(fd, &overl, &res, TRUE)) {
       res = GetLastError();
@@ -95,7 +101,7 @@ static ssize_t brlapi_writeFile(brlapi_fileDescriptor fd, const void *buffer, si
     }
 #endif /* __MINGW32__ */
   }
-  return n;
+  return (ssize_t) n;
 }
 
 /* brlapi_readFile */
@@ -112,12 +118,12 @@ static ssize_t brlapi_readFile(brlapi_fileDescriptor fd, void *buffer, size_t si
   for (n=0;n<size && res>=0;n+=res) {
 #ifdef __MINGW32__
     OVERLAPPED overl = {0, 0, {{0, 0}}, CreateEvent(NULL, TRUE, FALSE, NULL)};
-    if ((!ReadFile(fd,buf+n,size-n,&res,&overl)
+    if ((!ReadFile(fd,buf+n, (DWORD)(size-n),&res,&overl)
       && GetLastError() != ERROR_IO_PENDING) ||
       !GetOverlappedResult(fd, &overl, &res, TRUE)) {
       res = GetLastError();
       CloseHandle(overl.hEvent);
-      if (res == ERROR_HANDLE_EOF) return n;
+      if (res == ERROR_HANDLE_EOF) return (ssize_t) n;
       setErrno(res);
       return -1;
     }
@@ -140,21 +146,21 @@ static ssize_t brlapi_readFile(brlapi_fileDescriptor fd, void *buffer, size_t si
       /* Unexpected end of file ! */
       break;
   }
-  return n;
+  return (ssize_t) n;
 }
 
 /* brlapi_writePacket */
 /* Write a packet on the socket */
 ssize_t BRLAPI(writePacket)(brlapi_fileDescriptor fd, brlapi_packetType_t type, const void *buf, size_t size)
 {
-  uint32_t header[2] = { htonl(size), htonl(type) };
-  ssize_t res;
+	uint32_t header[2] = { htonl((u_long) size), htonl((u_long) type) };
+	ssize_t res;
 
-  /* first send packet header (size+type) */
+	/* first send packet header (size+type) */
   if ((res=brlapi_writeFile(fd,&header[0],sizeof(header)))<0) {
-    LibcError("write in writePacket");
-    return res;
-  }
+		LibcError("write in writePacket");
+		return res;
+	}
 
   /* eventually data */
   if (size && buf)
@@ -202,14 +208,14 @@ ssize_t BRLAPI(readPacketContent)(brlapi_fileDescriptor fd, size_t packetSize, v
 	&& errno != EAGAIN)
       goto out;
   }
-  if (res<MIN(bufSize,packetSize)) return -2; /* pkt smaller than announced => EOF */
+  if (res<(ssize_t)MIN(bufSize,packetSize)) return -2; /* pkt smaller than announced => EOF */
   if (packetSize>bufSize) {
     size_t discard = packetSize-bufSize;
-    for (res=0; res<discard / sizeof(foo); res++)
+    for (res=0; res<(ssize_t)(discard / sizeof(foo)); res++)
       brlapi_readFile(fd,foo,sizeof(foo),1);
     brlapi_readFile(fd,foo,discard % sizeof(foo),1);
   }
-  return packetSize;
+  return (ssize_t) packetSize;
 
 out:
   LibcError("read in brlapi_readPacket");
@@ -281,7 +287,7 @@ static int BRLAPI(expandHost)(const char *hostAndPort, char **host, char **port)
   if (!hostAndPort || !*hostAndPort) {
 #if defined(PF_LOCAL)
     *host = NULL;
-    *port = strdup("0");
+	*port = strdup("0");
     return PF_LOCAL;
 #else /* PF_LOCAL */
     *host = strdup("127.0.0.1");
@@ -313,8 +319,8 @@ static int BRLAPI(expandHost)(const char *hostAndPort, char **host, char **port)
 #endif /* PF_LOCAL */
     }
   } else {
-    *host = strdup(hostAndPort);
-    *port = strdup(BRLAPI_SOCKETPORT);
+	*host = strdup(hostAndPort);
+	*port = strdup(BRLAPI_SOCKETPORT);
     return PF_UNSPEC;
   }
 }

@@ -75,7 +75,7 @@ extern "C" {
 #endif /* FOR_BUILD */
 #endif /* HAVE_CONFIG_H */
 
-#if defined(__CYGWIN__) || defined(__MINGW32__)
+#if defined(__CYGWIN__) || defined(__MINGW32__) || defined(_MSC_VER)
 #define WINDOWS
 
 #ifndef HAVE_SDKDDKVER_H
@@ -109,9 +109,9 @@ extern "C" {
 #include <windows.h>
 #endif /* WINDOWS */
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(_MSC_VER)
 #include <_mingw.h>
-#endif /* __MINGW32__ */
+#endif /* defined(__MINGW32__) && !defined(_MSC_VER) */
 
 /*
  * The (poorly named) macro "interface" is unfortunately defined within
@@ -125,10 +125,13 @@ extern "C" {
 #include <sys/types.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <inttypes.h>
 
-#ifdef __MINGW32__
+#ifndef _MSC_VER
+#include <unistd.h>
+#endif
+
+#if defined(__MINGW32__) && !defined(_MSC_VER)
 #if (__MINGW32_MAJOR_VERSION < 3) || ((__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 10))
 extern int gettimeofday (struct timeval *tvp, void *tzp);
 #endif /* gettimeofday */
@@ -136,7 +139,7 @@ extern int gettimeofday (struct timeval *tvp, void *tzp);
 #if !defined(__MINGW64_VERSION_MAJOR) && ((__MINGW32_MAJOR_VERSION < 3) || ((__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 15)))
 extern void usleep (int usec);
 #endif /* usleep */
-#endif /* __MINGW32__ */
+#endif /* defined(__MINGW32__) && !defined(_MSC_VER) */
 
 #ifdef GRUB_RUNTIME
 #undef NESTED_FUNC_ATTR
@@ -348,6 +351,10 @@ mbsinit (const mbstate_t *ps) {
 #else /* WORDS_BIGENDIAN */
 #define CHARSET_ENDIAN_SUFFIX "LE"
 #endif /* WORDS_BIGENDIAN */
+
+#if !defined(SIZEOF_WCHAR_T_STR) && defined(_MSC_VER)
+#define SIZEOF_WCHAR_T_STR "2"
+#endif /* !defined(SIZEOF_WCHAR_T_STR) && defined(_MSC_VER) */
 
 #define WCHAR_CHARSET ("UCS-" SIZEOF_WCHAR_T_STR CHARSET_ENDIAN_SUFFIX)
 
