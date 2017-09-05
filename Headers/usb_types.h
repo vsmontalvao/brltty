@@ -330,6 +330,10 @@ typedef struct {
 typedef struct UsbDeviceStruct UsbDevice;
 typedef struct UsbSerialDataStruct UsbSerialData;
 
+#ifdef _MSC_VER
+typedef signed int ssize_t;
+#endif /* _MSC_VER */
+
 typedef struct {
   void *const buffer;
   const size_t size;
