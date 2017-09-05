@@ -1,0 +1,412 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{2D7C0329-E17F-4842-A8B8-6EC5D4C7EF84}</ProjectGuid>
+    <RootNamespace>brltty</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16225.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)..\..\Headers;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__MINGW32__;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;HAVE_STRING_H;HAVE_SDKDDKVER_H;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Drivers\Braille\Albatross\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Albatross\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Alva\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Alva\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Baum\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Baum\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrailComm\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\BrailComm\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrailleLite\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\BrailleLite\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrailleMemo\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\BrailleMemo\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrailleNote\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\BrailleNote\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Braudi\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Braudi\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrlAPI\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\BrlAPI\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Cebra\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Cebra\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\CombiBraille\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\CombiBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\EcoBraille\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\EcoBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\EuroBraille\eu_braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\EuroBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\EuroBraille\eu_clio.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\EuroBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\EuroBraille\eu_esysiris.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\EuroBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\FreedomScientific\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\FreedomScientific\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\HandyTech\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\HandyTech\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Hedo\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Hedo\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\HIMS\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\HIMS\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\HumanWare\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\HumanWare\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Iris\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Iris\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\LogText\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\LogText\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\MDV\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\MDV\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Metec\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Metec\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\MiniBraille\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\MiniBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\MultiBraille\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\MultiBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\NinePoint\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\NinePoint\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Papenmeier\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Papenmeier\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Pegasus\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Pegasus\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Seika\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Seika\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\TechniBraille\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\TechniBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\TSI\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\TSI\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\TTY\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\TTY\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\VideoBraille\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\VideoBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Virtual\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Virtual\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\VisioBraille\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\VisioBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Voyager\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\Voyager\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\XWindow\braille.c">
+      <ObjectFileName>$(IntDir)Drivers\Braille\XWindow\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Screen\Windows\screen.c" />
+    <ClCompile Include="..\..\Drivers\Speech\Alva\speech.c">
+      <ObjectFileName>$(IntDir)Drivers\Speech\Alva\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\BrailleLite\speech.c">
+      <ObjectFileName>$(IntDir)Drivers\Speech\BrailleLite\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\CombiBraille\speech.c">
+      <ObjectFileName>$(IntDir)Drivers\Speech\CombiBraille\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\ExternalSpeech\speech.c">
+      <ObjectFileName>$(IntDir)Drivers\Speech\ExternalSpeech\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\Festival\speech.c">
+      <ObjectFileName>$(IntDir)Drivers\Speech\Festival\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\GenericSay\speech.c">
+      <ObjectFileName>$(IntDir)Drivers\Speech\GenericSay\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\activity.c" />
+    <ClCompile Include="..\..\Programs\alert.c" />
+    <ClCompile Include="..\..\Programs\api_control.c" />
+    <ClCompile Include="..\..\Programs\async_alarm.c" />
+    <ClCompile Include="..\..\Programs\async_data.c" />
+    <ClCompile Include="..\..\Programs\async_event.c" />
+    <ClCompile Include="..\..\Programs\async_handle.c" />
+    <ClCompile Include="..\..\Programs\async_io.c" />
+    <ClCompile Include="..\..\Programs\async_signal.c" />
+    <ClCompile Include="..\..\Programs\async_task.c" />
+    <ClCompile Include="..\..\Programs\async_wait.c" />
+    <ClCompile Include="..\..\Programs\atb_compile.c" />
+    <ClCompile Include="..\..\Programs\atb_translate.c" />
+    <ClCompile Include="..\..\Programs\auth.c" />
+    <ClCompile Include="..\..\Programs\beep.c" />
+    <ClCompile Include="..\..\Programs\beep_windows.c" />
+    <ClCompile Include="..\..\Programs\bell.c" />
+    <ClCompile Include="..\..\Programs\bell_none.c" />
+    <ClCompile Include="..\..\Programs\blink.c" />
+    <ClCompile Include="..\..\Programs\bluetooth.c" />
+    <ClCompile Include="..\..\Programs\bluetooth_names.c" />
+    <ClCompile Include="..\..\Programs\bluetooth_none.c" />
+    <ClCompile Include="..\..\Programs\brl.c" />
+    <ClCompile Include="..\..\Programs\brlapi_keyranges.c" />
+    <ClCompile Include="..\..\Programs\brlapi_server.c" />
+    <ClCompile Include="..\..\Programs\brltty.c" />
+    <ClCompile Include="..\..\Programs\brl_base.c" />
+    <ClCompile Include="..\..\Programs\brl_driver.c" />
+    <ClCompile Include="..\..\Programs\brl_input.c" />
+    <ClCompile Include="..\..\Programs\brl_utils.c" />
+    <ClCompile Include="..\..\Programs\charset.c" />
+    <ClCompile Include="..\..\Programs\charset_windows.c" />
+    <ClCompile Include="..\..\Programs\cmd.c" />
+    <ClCompile Include="..\..\Programs\cmd_brlapi.c" />
+    <ClCompile Include="..\..\Programs\cmd_clipboard.c" />
+    <ClCompile Include="..\..\Programs\cmd_custom.c" />
+    <ClCompile Include="..\..\Programs\cmd_input.c" />
+    <ClCompile Include="..\..\Programs\cmd_keycodes.c" />
+    <ClCompile Include="..\..\Programs\cmd_learn.c" />
+    <ClCompile Include="..\..\Programs\cmd_miscellaneous.c" />
+    <ClCompile Include="..\..\Programs\cmd_navigation.c" />
+    <ClCompile Include="..\..\Programs\cmd_preferences.c" />
+    <ClCompile Include="..\..\Programs\cmd_queue.c" />
+    <ClCompile Include="..\..\Programs\cmd_speech.c" />
+    <ClCompile Include="..\..\Programs\cmd_toggle.c" />
+    <ClCompile Include="..\..\Programs\cmd_touch.c" />
+    <ClCompile Include="..\..\Programs\cmd_utils.c" />
+    <ClCompile Include="..\..\Programs\config.c" />
+    <ClCompile Include="..\..\Programs\core.c" />
+    <ClCompile Include="..\..\Programs\ctb_compile.c" />
+    <ClCompile Include="..\..\Programs\ctb_external.c" />
+    <ClCompile Include="..\..\Programs\ctb_native.c" />
+    <ClCompile Include="..\..\Programs\ctb_translate.c" />
+    <ClCompile Include="..\..\Programs\dataarea.c" />
+    <ClCompile Include="..\..\Programs\datafile.c" />
+    <ClCompile Include="..\..\Programs\device.c" />
+    <ClCompile Include="..\..\Programs\driver.c" />
+    <ClCompile Include="..\..\Programs\drivers.c" />
+    <ClCompile Include="..\..\Programs\dynld_windows.c" />
+    <ClCompile Include="..\..\Programs\file.c" />
+    <ClCompile Include="..\..\Programs\fm_adlib.c" />
+    <ClCompile Include="..\..\Programs\gio.c" />
+    <ClCompile Include="..\..\Programs\gio_bluetooth.c" />
+    <ClCompile Include="..\..\Programs\gio_null.c" />
+    <ClCompile Include="..\..\Programs\gio_serial.c" />
+    <ClCompile Include="..\..\Programs\gio_usb.c" />
+    <ClCompile Include="..\..\Programs\hidkeys.c" />
+    <ClCompile Include="..\..\Programs\hostcmd.c" />
+    <ClCompile Include="..\..\Programs\hostcmd_windows.c" />
+    <ClCompile Include="..\..\Programs\io_misc.c" />
+    <ClCompile Include="..\..\Programs\kbd.c" />
+    <ClCompile Include="..\..\Programs\kbd_keycodes.c" />
+    <ClCompile Include="..\..\Programs\kbd_none.c" />
+    <ClCompile Include="..\..\Programs\ktb_cmds.c" />
+    <ClCompile Include="..\..\Programs\ktb_compile.c" />
+    <ClCompile Include="..\..\Programs\ktb_keyboard.c" />
+    <ClCompile Include="..\..\Programs\ktb_list.c" />
+    <ClCompile Include="..\..\Programs\ktb_translate.c" />
+    <ClCompile Include="..\..\Programs\learn.c" />
+    <ClCompile Include="..\..\Programs\leds.c" />
+    <ClCompile Include="..\..\Programs\leds_none.c" />
+    <ClCompile Include="..\..\Programs\lock.c" />
+    <ClCompile Include="..\..\Programs\log.c" />
+    <ClCompile Include="..\..\Programs\menu.c" />
+    <ClCompile Include="..\..\Programs\menu_prefs.c" />
+    <ClCompile Include="..\..\Programs\message.c" />
+    <ClCompile Include="..\..\Programs\midi.c" />
+    <ClCompile Include="..\..\Programs\midi_windows.c" />
+    <ClCompile Include="..\..\Programs\mntfs_none.c" />
+    <ClCompile Include="..\..\Programs\mntpt.c" />
+    <ClCompile Include="..\..\Programs\mntpt_none.c" />
+    <ClCompile Include="..\..\Programs\notes.c" />
+    <ClCompile Include="..\..\Programs\notes_beep.c" />
+    <ClCompile Include="..\..\Programs\notes_fm.c" />
+    <ClCompile Include="..\..\Programs\notes_midi.c" />
+    <ClCompile Include="..\..\Programs\notes_pcm.c" />
+    <ClCompile Include="..\..\Programs\options.c" />
+    <ClCompile Include="..\..\Programs\params_none.c" />
+    <ClCompile Include="..\..\Programs\parse.c" />
+    <ClCompile Include="..\..\Programs\pcm.c" />
+    <ClCompile Include="..\..\Programs\pcm_windows.c" />
+    <ClCompile Include="..\..\Programs\pgmpath_windows.c" />
+    <ClCompile Include="..\..\Programs\pid.c" />
+    <ClCompile Include="..\..\Programs\pipe.c" />
+    <ClCompile Include="..\..\Programs\ports_windows.c" />
+    <ClCompile Include="..\..\Programs\prefs.c" />
+    <ClCompile Include="..\..\Programs\prefs_table.c" />
+    <ClCompile Include="..\..\Programs\profile.c" />
+    <ClCompile Include="..\..\Programs\program.c" />
+    <ClCompile Include="..\..\Programs\queue.c" />
+    <ClCompile Include="..\..\Programs\report.c" />
+    <ClCompile Include="..\..\Programs\revision.c" />
+    <ClCompile Include="..\..\Programs\routing.c" />
+    <ClCompile Include="..\..\Programs\scr.c" />
+    <ClCompile Include="..\..\Programs\scr_base.c" />
+    <ClCompile Include="..\..\Programs\scr_driver.c" />
+    <ClCompile Include="..\..\Programs\scr_frozen.c" />
+    <ClCompile Include="..\..\Programs\scr_gpm.c" />
+    <ClCompile Include="..\..\Programs\scr_help.c" />
+    <ClCompile Include="..\..\Programs\scr_main.c" />
+    <ClCompile Include="..\..\Programs\scr_menu.c" />
+    <ClCompile Include="..\..\Programs\scr_real.c" />
+    <ClCompile Include="..\..\Programs\scr_special.c" />
+    <ClCompile Include="..\..\Programs\scr_utils.c" />
+    <ClCompile Include="..\..\Programs\serial.c" />
+    <ClCompile Include="..\..\Programs\serial_windows.c" />
+    <ClCompile Include="..\..\Programs\service_windows.c" />
+    <ClCompile Include="..\..\Programs\ses.c" />
+    <ClCompile Include="..\..\Programs\spk.c" />
+    <ClCompile Include="..\..\Programs\spk_base.c" />
+    <ClCompile Include="..\..\Programs\spk_driver.c" />
+    <ClCompile Include="..\..\Programs\spk_input.c" />
+    <ClCompile Include="..\..\Programs\status.c" />
+    <ClCompile Include="..\..\Programs\system_windows.c" />
+    <ClCompile Include="..\..\Programs\thread.c" />
+    <ClCompile Include="..\..\Programs\timing.c" />
+    <ClCompile Include="..\..\Programs\ttb_compile.c" />
+    <ClCompile Include="..\..\Programs\ttb_native.c" />
+    <ClCompile Include="..\..\Programs\ttb_translate.c" />
+    <ClCompile Include="..\..\Programs\tune.c" />
+    <ClCompile Include="..\..\Programs\tune_build.c" />
+    <ClCompile Include="..\..\Programs\unicode.c" />
+    <ClCompile Include="..\..\Programs\update.c" />
+    <ClCompile Include="..\..\Programs\usb.c" />
+    <ClCompile Include="..\..\Programs\usb_adapters.c" />
+    <ClCompile Include="..\..\Programs\usb_belkin.c" />
+    <ClCompile Include="..\..\Programs\usb_cdc_acm.c" />
+    <ClCompile Include="..\..\Programs\usb_cp2101.c" />
+    <ClCompile Include="..\..\Programs\usb_cp2110.c" />
+    <ClCompile Include="..\..\Programs\usb_ftdi.c" />
+    <ClCompile Include="..\..\Programs\usb_hid.c" />
+    <ClCompile Include="..\..\Programs\usb_none.c" />
+    <ClCompile Include="..\..\Programs\variables.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

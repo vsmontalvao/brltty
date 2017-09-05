@@ -1,0 +1,748 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Drivers">
+      <UniqueIdentifier>{39a9e5d3-1bac-48b2-abc2-1389d047223d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille">
+      <UniqueIdentifier>{543e8d39-af51-4d62-8511-662b88f86811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Alva">
+      <UniqueIdentifier>{40e439a9-9183-4853-8b8e-c3a004d57d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Albatross">
+      <UniqueIdentifier>{0d42e527-d6ff-4d54-8e13-bf4d7d2c3592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\BrlAPI">
+      <UniqueIdentifier>{d691e97f-65ed-4190-a1c4-e78d69046380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\BrailComm">
+      <UniqueIdentifier>{183a17bf-fe9b-4c6a-b407-e0cac0f9a836}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Braudi">
+      <UniqueIdentifier>{2f9034dc-20e9-4aaf-81bf-9c60b47b8a9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\BrailleLite">
+      <UniqueIdentifier>{66267a01-561c-4bd3-a1eb-177b90e2e17a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Baum">
+      <UniqueIdentifier>{d8d27bf1-e24e-44e7-96be-d25bad8c053d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\BrailleNote">
+      <UniqueIdentifier>{5c512cc4-209a-4e3c-afc9-7f0551b48fa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\CombiBraille">
+      <UniqueIdentifier>{78ae6fa3-e80c-48cf-be1f-b71bb80f066e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Cebra">
+      <UniqueIdentifier>{a38f74ba-40c4-4fd6-8f96-c3be02904ed6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\EcoBraille">
+      <UniqueIdentifier>{6f8a1f70-b7e6-40f7-9d96-a7e9f6eec080}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\EuroBraille">
+      <UniqueIdentifier>{0a6daefd-3132-4f26-b325-69b34e93905f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\FreedomScientific">
+      <UniqueIdentifier>{74c35306-a721-4518-84f1-cdc7705df50b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Hedo">
+      <UniqueIdentifier>{7d5d6c6b-659a-4cd7-8f7f-02919f2cd826}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\HIMS">
+      <UniqueIdentifier>{28856ecc-1e39-45dc-b462-286b5f8d0e74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\HandyTech">
+      <UniqueIdentifier>{1f472c49-3fba-4289-a6e2-fd50de028625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\HumanWare">
+      <UniqueIdentifier>{edc09694-ae18-42cc-9417-b5a97c6faefd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Iris">
+      <UniqueIdentifier>{faa4cb5f-a0b2-4999-ac32-bb413928e6e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\LogText">
+      <UniqueIdentifier>{45da3083-8f67-4f29-908a-dd257f1f3d1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\MultiBraille">
+      <UniqueIdentifier>{2067d463-3448-4fd1-bd56-94d781365028}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\MDV">
+      <UniqueIdentifier>{9b30572e-c036-4263-abe2-87cb6adca86d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\BrailleMemo">
+      <UniqueIdentifier>{3557b0ca-da02-4bc9-90c2-81e81f9a2e77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\MiniBraille">
+      <UniqueIdentifier>{985cb597-9857-408f-9576-a6d1dceca355}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Metec">
+      <UniqueIdentifier>{a9f441fa-4d50-4722-b95c-2676abf66162}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\NinePoint">
+      <UniqueIdentifier>{a4613a93-5baa-4a13-a5c3-049445a93761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Papenmeier">
+      <UniqueIdentifier>{77dd5151-d76f-4e54-95ed-61b5dc44b39b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Pegasus">
+      <UniqueIdentifier>{c782c15e-d8d2-4ed1-9124-d52a5d3ab07f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Seika">
+      <UniqueIdentifier>{c753d774-e2dd-4b9b-969b-692505fb8b96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\TechniBraille">
+      <UniqueIdentifier>{dcf30b40-5a77-4a8d-b93d-e8cce9d80668}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\TSI">
+      <UniqueIdentifier>{6be78148-aeb1-4d3e-9ddb-dadee90209e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\TTY">
+      <UniqueIdentifier>{a7dff8f5-1414-456a-bc14-d5093c8f7e5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\VideoBraille">
+      <UniqueIdentifier>{3ec87766-9faa-4ea6-8db4-94d6524e7285}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Virtual">
+      <UniqueIdentifier>{126a4aa4-7210-4737-8e37-3bab0bba3d5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\VisioBraille">
+      <UniqueIdentifier>{8f678910-f601-4ff6-86fd-4902d92ce820}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\Voyager">
+      <UniqueIdentifier>{da1485e9-47dc-46f6-8646-48fdd8647723}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Braille\XWindow">
+      <UniqueIdentifier>{0b0c567f-521d-48ed-b108-7532600e4784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Speech">
+      <UniqueIdentifier>{3d096f6e-c55d-42bc-b336-8cf5c9e46155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Speech\Alva">
+      <UniqueIdentifier>{7776c0d1-a335-43d5-acc4-cf4eb119efa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Speech\BrailleLite">
+      <UniqueIdentifier>{74f835d9-1b2f-4a16-8b55-6d7358ca56b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Speech\CombiBraille">
+      <UniqueIdentifier>{fadf30bc-3a8d-4cb2-98e3-91b56cca09a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Speech\Festival">
+      <UniqueIdentifier>{a35389c2-87fb-4ca7-a83f-64f79376f5fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Speech\GenericSay">
+      <UniqueIdentifier>{87132d44-8b15-454e-bbd9-17414683d11a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drivers\Speech\ExternalSpeech">
+      <UniqueIdentifier>{c721b01f-c565-45cc-9fbc-6f57c0cdd69b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Programs\brltty.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\core.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\program.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\pgmpath_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\pid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\options.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\params_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\log.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\file.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\device.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\parse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\variables.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\datafile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\unicode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\charset.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\charset_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\timing.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\async_wait.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\async_alarm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\async_data.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\async_event.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\async_handle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\async_io.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\async_signal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\async_task.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\thread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\lock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\dynld_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ports_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\system_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\hostcmd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\hostcmd_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\revision.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\report.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\config.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\service_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\activity.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\prefs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\prefs_table.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\profile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\menu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\menu_prefs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ses.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\status.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\update.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\blink.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\dataarea.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_touch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_brlapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_clipboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_custom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_keycodes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_learn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_miscellaneous.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_navigation.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_preferences.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_speech.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\cmd_toggle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\learn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\pipe.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ttb_translate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ttb_compile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ttb_native.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\atb_compile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\atb_translate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ctb_translate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ctb_compile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ctb_external.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ctb_native.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ktb_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ktb_translate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\kbd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\kbd_keycodes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\kbd_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ktb_cmds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ktb_compile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\ktb_keyboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\bell_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\bell.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\leds_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\leds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\alert.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\tune_build.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\message.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\tune.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\notes_beep.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\notes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\beep_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\beep.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\notes_pcm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\pcm_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\pcm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\notes_midi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\midi_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\midi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\notes_fm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\fm_adlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\hidkeys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\drivers.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\driver.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_gpm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_real.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_base.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_driver.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\routing.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Screen\Windows\screen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_menu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_special.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_frozen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\scr_help.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\brl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\brl_base.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\brl_driver.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\brl_input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\brl_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\io_misc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\gio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\gio_serial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\gio_null.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\serial_windows.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\serial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\gio_usb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb_hid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb_adapters.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb_belkin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb_cdc_acm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb_cp2101.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb_cp2110.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb_ftdi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\usb_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\gio_bluetooth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\bluetooth_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\bluetooth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\bluetooth_names.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\mntpt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\mntpt_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\mntfs_none.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\spk_driver.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\spk.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\spk_base.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\spk_input.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\api_control.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\brlapi_server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\brlapi_keyranges.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Programs\auth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Alva\braille.c">
+      <Filter>Source Files\Drivers\Braille\Alva</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Albatross\braille.c">
+      <Filter>Source Files\Drivers\Braille\Albatross</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrlAPI\braille.c">
+      <Filter>Source Files\Drivers\Braille\BrlAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrailComm\braille.c">
+      <Filter>Source Files\Drivers\Braille\BrailComm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Braudi\braille.c">
+      <Filter>Source Files\Drivers\Braille\Braudi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrailleLite\braille.c">
+      <Filter>Source Files\Drivers\Braille\BrailleLite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Baum\braille.c">
+      <Filter>Source Files\Drivers\Braille\Baum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrailleNote\braille.c">
+      <Filter>Source Files\Drivers\Braille\BrailleNote</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\CombiBraille\braille.c">
+      <Filter>Source Files\Drivers\Braille\CombiBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Cebra\braille.c">
+      <Filter>Source Files\Drivers\Braille\Cebra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\EcoBraille\braille.c">
+      <Filter>Source Files\Drivers\Braille\EcoBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\FreedomScientific\braille.c">
+      <Filter>Source Files\Drivers\Braille\FreedomScientific</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Hedo\braille.c">
+      <Filter>Source Files\Drivers\Braille\Hedo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\HIMS\braille.c">
+      <Filter>Source Files\Drivers\Braille\HIMS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\HandyTech\braille.c">
+      <Filter>Source Files\Drivers\Braille\HandyTech</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\HumanWare\braille.c">
+      <Filter>Source Files\Drivers\Braille\HumanWare</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Iris\braille.c">
+      <Filter>Source Files\Drivers\Braille\Iris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\LogText\braille.c">
+      <Filter>Source Files\Drivers\Braille\LogText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\MultiBraille\braille.c">
+      <Filter>Source Files\Drivers\Braille\MultiBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\MDV\braille.c">
+      <Filter>Source Files\Drivers\Braille\MDV</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\BrailleMemo\braille.c">
+      <Filter>Source Files\Drivers\Braille\BrailleMemo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\MiniBraille\braille.c">
+      <Filter>Source Files\Drivers\Braille\MiniBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Metec\braille.c">
+      <Filter>Source Files\Drivers\Braille\Metec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\NinePoint\braille.c">
+      <Filter>Source Files\Drivers\Braille\NinePoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Pegasus\braille.c">
+      <Filter>Source Files\Drivers\Braille\Pegasus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Papenmeier\braille.c">
+      <Filter>Source Files\Drivers\Braille\Papenmeier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Seika\braille.c">
+      <Filter>Source Files\Drivers\Braille\Seika</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\TechniBraille\braille.c">
+      <Filter>Source Files\Drivers\Braille\TechniBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\TSI\braille.c">
+      <Filter>Source Files\Drivers\Braille\TSI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\TTY\braille.c">
+      <Filter>Source Files\Drivers\Braille\TTY</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\VideoBraille\braille.c">
+      <Filter>Source Files\Drivers\Braille\VideoBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Voyager\braille.c">
+      <Filter>Source Files\Drivers\Braille\Voyager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\Virtual\braille.c">
+      <Filter>Source Files\Drivers\Braille\Virtual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\VisioBraille\braille.c">
+      <Filter>Source Files\Drivers\Braille\VisioBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\XWindow\braille.c">
+      <Filter>Source Files\Drivers\Braille\XWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\BrailleLite\speech.c">
+      <Filter>Source Files\Drivers\Speech\BrailleLite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\CombiBraille\speech.c">
+      <Filter>Source Files\Drivers\Speech\CombiBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\Festival\speech.c">
+      <Filter>Source Files\Drivers\Speech\Festival</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\GenericSay\speech.c">
+      <Filter>Source Files\Drivers\Speech\GenericSay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\ExternalSpeech\speech.c">
+      <Filter>Source Files\Drivers\Speech\ExternalSpeech</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Speech\Alva\speech.c">
+      <Filter>Source Files\Drivers\Speech\Alva</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\EuroBraille\eu_esysiris.c">
+      <Filter>Source Files\Drivers\Braille\EuroBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\EuroBraille\eu_braille.c">
+      <Filter>Source Files\Drivers\Braille\EuroBraille</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Drivers\Braille\EuroBraille\eu_clio.c">
+      <Filter>Source Files\Drivers\Braille\EuroBraille</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
