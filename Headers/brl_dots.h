@@ -19,7 +19,9 @@
 #ifndef BRLTTY_INCLUDED_BRL_DOTS
 #define BRLTTY_INCLUDED_BRL_DOTS
 
+#ifndef _MSC_VER
 #include <strings.h>
+#endif /* _MSC_VER */
 
 #ifdef __MINGW32__
 extern int ffs (int i);
