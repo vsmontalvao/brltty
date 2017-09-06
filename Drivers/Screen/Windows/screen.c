@@ -21,7 +21,9 @@
 #include "log.h"
 #include "parse.h"
 #include "brl_cmds.h"
+#ifndef _MSC_VER
 #include "system_windows.h"
+#endif /* _MSC_VER */
 #include "kbd_keycodes.h"
 #include "unicode.h"
 
@@ -43,14 +45,22 @@ processParameters_WindowsScreen (char **parameters) {
   if (*parameters[PARM_ROOT])
     if (!validateYesNo(&root, parameters[PARM_ROOT]))
       logMessage(LOG_WARNING, "%s: %s", "invalid root setting", parameters[PARM_ROOT]);
+#ifdef _MSC_VER
+  if (root && AttachConsole)
+#else /* _MSC_VER */
   if (root && AttachConsoleProc)
+#endif /* _MSC_VER */
     logMessage(LOG_WARNING, "No need for root BRLTTY on newer (XP or later) systems");
 
   followFocus = 1;
   if (*parameters[PARM_FOLLOWFOCUS])
     if (!validateYesNo(&followFocus, parameters[PARM_FOLLOWFOCUS]))
       logMessage(LOG_WARNING, "%s: %s", "invalid follow focus setting", parameters[PARM_FOLLOWFOCUS]);
+#ifdef _MSC_VER
+  if (followFocus && !AttachConsole)
+#else /* _MSC_VER */
   if (followFocus && !AttachConsoleProc)
+#endif /* _MSC_VER */
     logMessage(LOG_WARNING, "Cannot follow focus on older (pre-XP) systems");
   return 1;
 }
@@ -143,7 +153,11 @@ currentVirtualTerminal_WindowsScreen (void) {
   unreadable = NULL;
   altTab = NULL;
 
+#ifdef _MSC_VER
+  if (followFocus && (AttachConsole || root) && GetAltTabInfoA) {
+#else /* _MSC_VER */
   if (followFocus && (AttachConsoleProc || root) && GetAltTabInfoAProc) {
+#endif /* _MSC_VER */
     altTabInfo.cbSize = sizeof(altTabInfo);
     EnumWindows(findAltTab, 0);
 
@@ -360,7 +374,12 @@ doInsertWriteConsoleInput (BOOL down, WCHAR wchar, WORD vk, WORD scancode, DWORD
 
 static int 
 doInsertSendInput (BOOL down, WCHAR wchar, WORD vk, WORD scancode, DWORD flags) {
-  if (SendInputProc) {
+
+#ifdef _MSC_VER
+    if (SendInput) {
+#else /* _MSC_VER */
+    if (SendInputProc) {
+#endif /* _MSC_VER */
     UINT num;
     INPUT input;
     KEYBDINPUT *ki = &input.ki;

@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE ht
+#define DRIVER_NAME HandyTech
+#define DRIVER_COMMENT "Modular 20/40/80, Modular Evolution 64/88, Modular Connect 88, Active Braille, Active Star 40, Actilino, Basic Braille 16/20/32/40/48/64/80, Braillino, Braille Wave, Easy Braille, Braille Star 40/80, Connect Braille 40, Bookworm"
+#define DRIVER_VERSION "0.6"
+#define DRIVER_DEVELOPERS "Andreas Gross <andi.gross@gmx.de>, Dave Mielke <dave@mielke.cc>, Mario Lang <mlang@delysid.org>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -627,15 +635,25 @@ getHidFirmwareVersion (BrailleDisplay *brl) {
   hidFirmwareVersion = 0;
 
   if (hidReportSize_OutVersion) {
-    unsigned char report[hidReportSize_OutVersion];
+#ifdef _MSC_VER
+      unsigned char* report = (unsigned char*)malloc(hidReportSize_OutVersion * sizeof(*report));
+#else /* _MSC_VER */
+      unsigned char report[hidReportSize_OutVersion];
+#endif /* _MSC_VER */
     ssize_t result = gioGetHidReport(brl->gioEndpoint,
                                      HT_HID_RPT_OutVersion, report, sizeof(report));
 
     if (result > 0) {
       hidFirmwareVersion = (report[1] << 8) | report[2];
       logMessage(LOG_INFO, "Firmware Version: %u.%u", report[1], report[2]);
+#ifdef _MSC_VER
+      free(report);
+#endif /* _MSC_VER */
       return 1;
     }
+#ifdef _MSC_VER
+    free(report);
+#endif /* _MSC_VER */
   }
 
   return 0;
@@ -644,14 +662,24 @@ getHidFirmwareVersion (BrailleDisplay *brl) {
 static int
 executeHidFirmwareCommand (BrailleDisplay *brl, HtHidCommand command) {
   if (hidReportSize_InCommand) {
-    unsigned char report[hidReportSize_InCommand];
+#ifdef _MSC_VER
+      unsigned char* report = (unsigned char*)malloc(hidReportSize_InCommand * sizeof(*report));
+#else /* _MSC_VER */
+      unsigned char report[hidReportSize_InCommand];
+#endif /* _MSC_VER */
 
     report[0] = HT_HID_RPT_InCommand;
     report[1] = command;
 
     if (gioWriteHidReport(brl->gioEndpoint, report, sizeof(report)) != -1) {
+#ifdef _MSC_VER
+        free(report);
+#endif /* _MSC_VER */
       return 1;
     }
+#ifdef _MSC_VER
+    free(report);
+#endif /* _MSC_VER */
   }
 
   return 0;
@@ -759,7 +787,11 @@ writeUsbData2 (
 
   if (hidReportSize_InData) {
     while (size) {
-      unsigned char report[hidReportSize_InData];
+#ifdef _MSC_VER
+        unsigned char* report = (unsigned char*)malloc(hidReportSize_InData * sizeof(*report));
+#else /* _MSC_VER */
+        unsigned char report[hidReportSize_InData];
+#endif /* _MSC_VER */
       unsigned char count = MIN(size, (sizeof(report) - 2));
       int result;
 
@@ -775,6 +807,9 @@ writeUsbData2 (
 
       index += count;
       size -= count;
+#ifdef _MSC_VER
+      free(report);
+#endif /* _MSC_VER */
     }
   }
 
@@ -813,7 +848,11 @@ writeUsbData3 (
 
   if (hidReportSize_InData) {
     while (size) {
-      unsigned char report[hidReportSize_InData];
+#ifdef _MSC_VER
+        unsigned char* report = (unsigned char*)malloc(hidReportSize_InData * sizeof(*report));
+#else /* _MSC_VER */
+        unsigned char report[hidReportSize_InData];
+#endif /* _MSC_VER */
       const unsigned char count = MIN(size, (sizeof(report) - 2));
       int result;
 
@@ -827,6 +866,9 @@ writeUsbData3 (
 
       index += count;
       size -= count;
+#ifdef _MSC_VER
+      free(report);
+#endif /* _MSC_VER */
     }
   }
 
@@ -842,7 +884,11 @@ filterUsbInput3 (UsbInputFilterData *data) {
       (buffer[0] == HT_HID_RPT_OutData) &&
       (buffer[1] <= (data->length - 2))) {
     data->length = buffer[1];
-    memmove(data->buffer, data->buffer+2, data->length);
+#ifdef _MSC_VER
+    memmove(data->buffer, (unsigned char *)data->buffer + 2, data->length);
+#else /* _MSC_VER */
+    memmove(data->buffer, data->buffer + 2, data->length);
+#endif /* _MSC_VER */
   }
 
   return 1;
@@ -1363,24 +1409,44 @@ writeCells (BrailleDisplay *brl) {
 
 static int
 writeCells_statusAndText (BrailleDisplay *brl) {
-  unsigned char buffer[1 + brl->data->model->statusCells + brl->data->model->textCells];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((1 + brl->data->model->statusCells + brl->data->model->textCells) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[1 + brl->data->model->statusCells + brl->data->model->textCells];
+#endif /* _MSC_VER */
   unsigned char *byte = buffer;
 
   *byte++ = HT_PKT_Braille;
   byte = mempcpy(byte, brl->data->rawStatus, brl->data->model->statusCells);
   byte = mempcpy(byte, brl->data->rawData, brl->data->model->textCells);
 
-  return writeBrailleMessage(brl, NULL, HT_PKT_Braille, buffer, byte-buffer);
+#ifdef _MSC_VER
+  int writeResult = writeBrailleMessage(brl, NULL, HT_PKT_Braille, buffer, byte - buffer);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBrailleMessage(brl, NULL, HT_PKT_Braille, buffer, byte - buffer);
+#endif /* _MSC_VER */
 }
 
 static int
 writeCells_Bookworm (BrailleDisplay *brl) {
-  unsigned char buffer[1 + brl->data->model->statusCells + brl->data->model->textCells + 1];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((1 + brl->data->model->statusCells + brl->data->model->textCells + 1) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[1 + brl->data->model->statusCells + brl->data->model->textCells + 1];
+#endif /* _MSC_VER */
 
   buffer[0] = 0X01;
   memcpy(buffer+1, brl->data->rawData, brl->data->model->textCells);
   buffer[sizeof(buffer)-1] = SYN;
+#ifdef _MSC_VER
+  int writeResult = writeBrailleMessage(brl, NULL, 0X01, buffer, sizeof(buffer));
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
   return writeBrailleMessage(brl, NULL, 0X01, buffer, sizeof(buffer));
+#endif /* _MSC_VER */
 }
 
 static int

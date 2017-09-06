@@ -22,7 +22,9 @@
 #include <fcntl.h>
 
 #include "log.h"
+#ifndef _MSC_VER
 #include "system_windows.h"
+#endif /* _MSC_VER */
 #include "hostcmd_windows.h"
 #include "hostcmd_internal.h"
 
@@ -113,7 +115,11 @@ finishParentHostCommandStream (HostCommandStream *hcs, void *data) {
     *handle = INVALID_HANDLE_VALUE;
 
     if (!finishHostCommandStream(hcs, fileDescriptor)) {
-      _close(fileDescriptor);
+#ifdef _MSC_VER
+        _close(fileDescriptor);
+#else /* _MSC_VER */
+        close(fileDescriptor);
+#endif /* _MSC_VER */
       return 0;
     }
   }

@@ -1285,7 +1285,7 @@ static int brlapi___writeText(brlapi_handle_t *handle, int cursor, const void *s
           wmemset((wchar_t *)p, L' ', extra);
           p += sizeof(wchar_t) * extra;
       } else {
-          min = (unsigned int) MIN(len, dispSize);
+          min = (unsigned int) MIN(len, (unsigned int) dispSize);
           memcpy(p, str, min);
           p += min;
           memset(p, ' ', dispSize-min);

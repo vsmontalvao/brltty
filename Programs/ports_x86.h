@@ -16,6 +16,11 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define __asm__ __asm
+#define __volatile__ __volatile
+#endif /* _MSC_VER */
+
 unsigned char
 readPort1 (unsigned short int port) {
   unsigned char v;

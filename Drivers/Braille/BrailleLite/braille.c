@@ -25,6 +25,12 @@
  * Some additions by: Dave Mielke <dave@mielke.cc>
  */
 
+#define DRIVER_CODE bl
+#define DRIVER_NAME BrailleLite
+#define DRIVER_COMMENT "18/40/M20/M40"
+#define DRIVER_VERSION "0.6.0 (June 2003)"
+#define DRIVER_DEVELOPERS "Nikhil Nair"
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -342,7 +348,11 @@ brl_construct (BrailleDisplay *brl, char **parameters, const char *device)
               qfill();
 
               if (qlen) {
-                char response[qlen + 1];
+#ifdef _MSC_VER
+                  char* response = (char*) malloc((qlen + 1) * sizeof(*response));
+#else /* _MSC_VER */
+                  char response[qlen + 1];
+#endif /* _MSC_VER */
                 int length = 0;
 
                 do {
@@ -362,6 +372,10 @@ brl_construct (BrailleDisplay *brl, char **parameters, const char *device)
                   blitesz = atoi(&response[3]);
                   if (blitesz <= 20) barcmds = &bar1cmds;
                 }
+
+#ifdef _MSC_VER
+                free(response);
+#endif /* _MSC_VER */
               }
             }
 

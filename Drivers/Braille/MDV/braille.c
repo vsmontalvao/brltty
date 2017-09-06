@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE md
+#define DRIVER_NAME MDV
+#define DRIVER_COMMENT "MB208, MB248, MB408L, MB408L+, Lilli Blu"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -410,13 +418,23 @@ brl_writeStatus (BrailleDisplay *brl, const unsigned char *cells) {
 static int
 brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
   if (cellsHaveChanged(brl->data->text.cells, brl->buffer, brl->textColumns, NULL, NULL, &brl->data->text.rewrite)) {
-    unsigned char cells[brl->statusColumns + brl->textColumns];
+#ifdef _MSC_VER
+      unsigned char* cells = (unsigned char*)malloc((brl->statusColumns + brl->textColumns) * sizeof(*cells));
+#else /* _MSC_VER */
+      unsigned char cells[brl->statusColumns + brl->textColumns];
+#endif /* _MSC_VER */
     unsigned char *cell = cells;
 
     cell = mempcpy(cell, brl->data->status.cells, brl->statusColumns);
     cell = translateOutputCells(cell, brl->data->text.cells, brl->textColumns);
 
+#ifdef _MSC_VER
+    int writeResult = writePacket(brl, MD_CODE_WRITE_ALL, cells, (cell - cells));
+    free(cells);
+    if (!writeResult) return 0;
+#else /* _MSC_VER */
     if (!writePacket(brl, MD_CODE_WRITE_ALL, cells, (cell - cells))) return 0;
+#endif /* _MSC_VER */
   }
 
   return 1;

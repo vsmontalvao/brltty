@@ -21,6 +21,14 @@
  * Maintained by: Dave Mielke <dave@mielke.cc>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE fv
+#define DRIVER_NAME Festival
+#define DRIVER_COMMENT "text to speech engine"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS ""
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

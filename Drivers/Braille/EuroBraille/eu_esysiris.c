@@ -21,6 +21,14 @@
  ** Made by Yannick PLASSIARD <yan@mistigri.org>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE eu
+#define DRIVER_NAME EuroBraille
+#define DRIVER_COMMENT "AzerBraille, Clio, Esys, Iris, NoteBraille, Scriba"
+#define DRIVER_VERSION "2.0"
+#define DRIVER_DEVELOPERS "Yannick PLASSIARD <yan@mistigri.org>, Olivier BERT <obert01@mistigri.org>, Nicolas PITRE <nico@fluxnic.net>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -444,7 +452,12 @@ readPacket (BrailleDisplay *brl, void *packet, size_t size) {
 static ssize_t
 writePacket (BrailleDisplay *brl, const void *packet, size_t size) {
   int packetSize = size + 2;
+#ifdef _MSC_VER
+  unsigned char* buf = (unsigned char*) malloc((packetSize + 2) * sizeof(*buf));
+#else /* _MSC_VER */
   unsigned char buf[packetSize + 2];
+#endif /* _MSC_VER */
+
   if (!io || !packet || !size)
     return (-1);
   buf[0] = STX;
@@ -453,7 +466,14 @@ writePacket (BrailleDisplay *brl, const void *packet, size_t size) {
   memcpy(buf + 3, packet, size);
   buf[sizeof(buf)-1] = ETX;
   logOutputPacket(buf, sizeof(buf));
+
+#ifdef _MSC_VER
+  int writeResult = io->writeData(brl, buf, sizeof(buf));
+  free(buf);
+  return writeResult;
+#else /* _MSC_VER */
   return io->writeData(brl, buf, sizeof(buf));
+#endif /* _MSC_VER */
 }
 
 static const ModelEntry *
@@ -471,7 +491,7 @@ getModelEntry (unsigned char identifier) {
 static int
 handleSystemInformation (BrailleDisplay *brl, unsigned char *packet) {
   int logLevel = LOG_INFO;
-  const char *infoDescription;
+  const char *infoDescription = "";
   enum {Unknown, End, String, Dec8, Dec16, Hex32} infoType;
 
   switch(packet[0]) {
@@ -859,14 +879,25 @@ writeWindow (BrailleDisplay *brl) {
   unsigned int size = brl->textColumns * brl->textRows;
   
   if (cellsHaveChanged(previousCells, brl->buffer, size, NULL, NULL, &forceWindowRewrite)) {
-    unsigned char data[size + 2];
+#ifdef _MSC_VER
+    unsigned char* data = (unsigned char*) malloc((size + 2) * sizeof(*data));
+#else /* _MSC_VER */
+      unsigned char data[size + 2];
+#endif /* _MSC_VER */
+
     unsigned char *byte = data;
 
     *byte++ = LP_BRAILLE_DISPLAY;
     *byte++ = LP_BRAILLE_DISPLAY_STATIC;
     byte = translateOutputCells(byte, brl->buffer, size);
 
-    if (writePacket(brl, data, byte-data) == -1) return 0;
+#ifdef _MSC_VER
+    int writeResult = writePacket(brl, data, byte - data);
+    free(data);
+    if (writeResult == -1) return 0;
+#else /* _MSC_VER */
+    if (writePacket(brl, data, byte - data) == -1) return 0;
+#endif /* _MSC_VER */
   }
 
   return 1;
@@ -885,7 +916,11 @@ writeVisual (BrailleDisplay *brl, const wchar_t *text) {
       unsigned int size = brl->textColumns * brl->textRows;
       
       if (textHasChanged(previousText, text, size, NULL, NULL, &forceVisualRewrite)) {
-        unsigned char data[size + 2];
+#ifdef _MSC_VER
+          unsigned char* data = (unsigned char*)malloc((size + 2) * sizeof(*data));
+#else /* _MSC_VER */
+          unsigned char data[size + 2];
+#endif /* _MSC_VER */
         unsigned char *byte = data;
 
         *byte++ = LP_LCD_DISPLAY;
@@ -901,7 +936,13 @@ writeVisual (BrailleDisplay *brl, const wchar_t *text) {
           }
         }
 
-        if (writePacket(brl, data, byte-data) == -1) return 0;
+#ifdef _MSC_VER
+        int writeResult = writePacket(brl, data, byte - data);
+        free(data);
+        if (writeResult == -1) return 0;
+#else /* _MSC_VER */
+        if (writePacket(brl, data, byte - data) == -1) return 0;
+#endif /* _MSC_VER */
       }
     }
 

@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE tn
+#define DRIVER_NAME TechniBraille
+#define DRIVER_COMMENT "Manager 40"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -77,7 +85,12 @@ readPacket (BrailleDisplay *brl, unsigned char *packet, int length) {
 
 static int
 writePacket (BrailleDisplay *brl, unsigned char function, unsigned char *data, unsigned char count) {
-  unsigned char buffer[count + 4];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((count + 4) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[count + 4];
+#endif /* _MSC_VER */
+
   unsigned char *byte = buffer;
 
   *byte++ = 0;
@@ -100,16 +113,30 @@ writePacket (BrailleDisplay *brl, unsigned char function, unsigned char *data, u
   }
 
   logSystemError("serial write");
+#ifdef _MSC_VER
+  free(buffer);
+#endif /* _MSC_VER */
+
   return 0;
 }
 
 static int
 writeBrailleCells (BrailleDisplay *brl) {
   size_t count = brl->textColumns;
+#ifdef _MSC_VER
+  unsigned char* cells = (unsigned char*)malloc(count * sizeof(*cells));
+#else /* _MSC_VER */
   unsigned char cells[count];
+#endif /* _MSC_VER */
 
   translateOutputCells(cells, brailleCells, count);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, 1, cells, count);
+  free(cells);
+  return writeResult;
+#else /* _MSC_VER */
   return writePacket(brl, 1, cells, count);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -120,7 +147,12 @@ clearBrailleCells (BrailleDisplay *brl) {
 
 static int
 writeVisualText (BrailleDisplay *brl) {
-  unsigned char bytes[brl->textColumns];
+#ifdef _MSC_VER
+    unsigned char* bytes = (unsigned char*)malloc((brl->textColumns) * sizeof(*bytes));
+#else /* _MSC_VER */
+    unsigned char bytes[brl->textColumns];
+#endif /* _MSC_VER */
+
   int i;
 
   for (i=0; i<brl->textColumns; ++i) {
@@ -128,7 +160,13 @@ writeVisualText (BrailleDisplay *brl) {
     bytes[i] = iswLatin1(character)? character: '?';
   }
 
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, 2, bytes, brl->textColumns);
+  free(bytes);
+  return writeResult;
+#else /* _MSC_VER */
   return writePacket(brl, 2, bytes, brl->textColumns);
+#endif /* _MSC_VER */
 }
 
 static int

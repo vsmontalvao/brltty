@@ -63,6 +63,10 @@ typedef struct {
   SerialFlowControl flowControl;
 } SerialParameters;
 
+#ifdef _MSC_VER
+typedef signed int ssize_t;
+#endif /* _MSC_VER */
+
 #define SERIAL_DEFAULT_BAUD 9600
 #define SERIAL_DEFAULT_DATA_BITS 8
 #define SERIAL_DEFAULT_STOP_BITS SERIAL_STOP_1

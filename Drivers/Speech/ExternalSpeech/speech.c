@@ -21,6 +21,14 @@
  * Stéphane Doyon <s.doyon@videotron.ca>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE xs
+#define DRIVER_NAME ExternalSpeech
+#define DRIVER_COMMENT "runs /usr/local/bin/externalspeech"
+#define DRIVER_VERSION "0.8 (September 2004)"
+#define DRIVER_DEVELOPERS "Stéphane Doyon <s.doyon@videotron.ca>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE vs
+#define DRIVER_NAME VisioBraille
+#define DRIVER_COMMENT "20/40"
+#define DRIVER_VERSION "0.2 (2002)"
+#define DRIVER_DEVELOPERS "Sébastien Hinderer <Sebastien.Hinderer@ens-lyon.org>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

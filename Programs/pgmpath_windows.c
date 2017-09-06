@@ -20,7 +20,9 @@
 
 #include "log.h"
 #include "pgmpath.h"
+#ifndef _MSC_VER
 #include "system_windows.h"
+#endif /* _MSC_VER */
 
 char *
 getProgramPath (void) {

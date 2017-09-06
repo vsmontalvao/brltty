@@ -21,6 +21,14 @@
  ** Made by Olivier BER` <obert01@mistigri.org>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE eu
+#define DRIVER_NAME EuroBraille
+#define DRIVER_COMMENT "AzerBraille, Clio, Esys, Iris, NoteBraille, Scriba"
+#define DRIVER_VERSION "2.0"
+#define DRIVER_DEVELOPERS "Yannick PLASSIARD <yan@mistigri.org>, Olivier BERT <obert01@mistigri.org>, Nicolas PITRE <nico@fluxnic.net>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -317,7 +325,12 @@ needsEscape (unsigned char byte) {
 
 static ssize_t
 readPacket (BrailleDisplay *brl, void *packet, size_t size) {
-  unsigned char buffer[size + 4];
+#ifdef _MSC_VER
+  unsigned char* buffer = (unsigned char*)malloc((size + 4) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[size + 4];
+#endif /* _MSC_VER */
+
   int offset = 0;
   int escape = 0;
 
@@ -330,6 +343,9 @@ readPacket (BrailleDisplay *brl, void *packet, size_t size) {
       if (!io->readByte(brl, &byte, (started || escape)))
         {
           if (started) logPartialPacket(buffer, offset);
+#ifdef _MSC_VER
+          free(buffer);
+#endif /* _MSC_VER */
           return (errno == EAGAIN)? 0: -1;
         }
 
@@ -436,9 +452,15 @@ readPacket (BrailleDisplay *brl, void *packet, size_t size) {
           inputPacketNumber = buffer[offset];
 
           memcpy(packet, &buffer[1], offset-1);
+#ifdef _MSC_VER
+          free(buffer);
+#endif /* _MSC_VER */
           return offset;
         }
     }
+#ifdef _MSC_VER
+    free(buffer);
+#endif /* _MSC_VER */
 }
 
 static ssize_t
@@ -449,7 +471,11 @@ writePacket (BrailleDisplay *brl, const void *packet, size_t size) {
   parity ^= (byte);
 
   /* limit case, every char is escaped */
-  unsigned char	buffer[(size + 4) * 2]; 
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc(((size + 4) * 2) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char	buffer[(size + 4) * 2];
+#endif /* _MSC_VER */
   unsigned char	*target = buffer;
   const unsigned char *source = packet;
   unsigned char	parity = 0;
@@ -473,6 +499,9 @@ writePacket (BrailleDisplay *brl, const void *packet, size_t size) {
     logOutputPacket(buffer, count);
     return io->writeData(brl, buffer, count);
   }
+#ifdef _MSC_VER
+  free(buffer);
+#endif /* _MSC_VER */
 #undef PUT
 }
 
@@ -529,7 +558,11 @@ static int
 writeWindow (BrailleDisplay *brl) {
   static unsigned char previousCells[MAXIMUM_DISPLAY_SIZE];
   size_t size = brl->textColumns * brl->textRows;
+#ifdef _MSC_VER
+  unsigned char* buffer = (unsigned char*) malloc((size + 2) * sizeof(*buffer));
+#else /* _MSC_VER */
   unsigned char buffer[size + 2];
+#endif /* _MSC_VER */
 
   if (cellsHaveChanged(previousCells, brl->buffer, size, NULL, NULL, &forceWindowRewrite)) {
     buffer[0] = 'D';
@@ -538,6 +571,9 @@ writeWindow (BrailleDisplay *brl) {
     writePacket(brl, buffer, sizeof(buffer));
   }
 
+#ifdef _MSC_VER
+  free(buffer);
+#endif /* _MSC_VER */
   return 1;
 }
 
@@ -564,7 +600,11 @@ writeVisual (BrailleDisplay *brl, const wchar_t *text) {
       const wchar_t *end = source + size;
       const wchar_t *cursor = (brl->cursor != BRL_NO_CURSOR)? source+brl->cursor: NULL;
 
+#ifdef _MSC_VER
+      unsigned char* buffer = (unsigned char*) malloc((size + 4) * sizeof(*buffer));
+#else /* _MSC_VER */
       unsigned char buffer[size + 4]; // code, subcode, and possibly two bytes for cursor
+#endif /* _MSC_VER */
       unsigned char *target = buffer;
 
       *target++ = 'D';
@@ -584,6 +624,9 @@ writeVisual (BrailleDisplay *brl, const wchar_t *text) {
       }
 
       writePacket(brl, buffer, target-buffer);
+#ifdef _MSC_VER
+      free(buffer);
+#endif /* _MSC_VER */
     }
   }
 

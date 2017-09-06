@@ -20,6 +20,14 @@
  * rsynth package.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE gs
+#define DRIVER_NAME GenericSay
+#define DRIVER_COMMENT "pipes to /usr/local/bin/say"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS ""
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

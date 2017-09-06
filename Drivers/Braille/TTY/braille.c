@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE tt
+#define DRIVER_NAME TTY
+#define DRIVER_COMMENT "terminfo"
+#define DRIVER_VERSION "0.2 (August, 2004)"
+#define DRIVER_DEVELOPERS "Samuel Thibault <samuel.thibault@ens-lyon.org>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -297,7 +305,11 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
 #endif /* GOT_CURSES */
 
   {
-    wchar_t braille[brl->textColumns];
+#ifdef _MSC_VER
+      wchar_t* braille = (wchar_t*)malloc((brl->textColumns) * sizeof(*braille));
+#else /* _MSC_VER */
+      wchar_t braille[brl->textColumns];
+#endif /* _MSC_VER */
 
     for (unsigned int row=0; row<brl->textRows; row++) {
       unsigned int offset = row * brl->textColumns;
@@ -324,6 +336,9 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
         newLine();
       }
     }
+#ifdef _MSC_VER
+    free(braille);
+#endif /* _MSC_VER */
   }
 
 #ifdef GOT_CURSES

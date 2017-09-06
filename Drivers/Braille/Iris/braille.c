@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE ir
+#define DRIVER_NAME Iris
+#define DRIVER_COMMENT ""
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Sébastien Hinderer <Sebastien.Hinderer@ens-lyon.org>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <fcntl.h>
@@ -959,7 +967,11 @@ writeNativePacket (
   BrailleDisplay *brl, Port *port,
   const unsigned char *packet, size_t size
 ) {
+#ifdef _MSC_VER
+  unsigned char* buffer = (unsigned char*)malloc(((size * 2) + 2) * sizeof(*buffer));
+#else /* _MSC_VER */
   unsigned char	buffer[(size * 2) + 2];
+#endif /* _MSC_VER */
   size_t count;
 
   {
@@ -978,6 +990,10 @@ writeNativePacket (
   }
 
   if (!port->writeNativePacket(brl, port->gioEndpoint, buffer, count)) return 0;
+#ifdef _MSC_VER
+  free(buffer);
+#endif /* _MSC_VER */
+
   return count;
 }
 
@@ -996,7 +1012,11 @@ static int
 writeEurobraillePacket (BrailleDisplay *brl, Port *port, const void *data, size_t size) {
   size_t count;
   size_t packetSize = size + 2;
+#ifdef _MSC_VER
+  unsigned char* packet = (unsigned char*)malloc((packetSize + 2) * sizeof(*packet));
+#else /* _MSC_VER */
   unsigned char	packet[packetSize + 2];
+#endif /* _MSC_VER */
   unsigned char *p = packet;
 
   *p++ = STX;
@@ -1006,7 +1026,14 @@ writeEurobraillePacket (BrailleDisplay *brl, Port *port, const void *data, size_
   *p++ = ETX;
 
   count = p - packet;
+#ifdef _MSC_VER
+  int writeResult = writeBraillePacket(brl, port->gioEndpoint, packet, count);
+  free(packet);
+  if (!writeResult) return 0;
+#else /* _MSC_VER */
   if (!writeBraillePacket(brl, port->gioEndpoint, packet, count)) return 0;
+#endif /* _MSC_VER */
+
   return count;
 }
 
@@ -1035,19 +1062,39 @@ writeDots (BrailleDisplay *brl, Port *port, const unsigned char *dots) {
 static size_t
 writeWindow (BrailleDisplay *brl, const unsigned char *text) {
   size_t size = brl->textColumns * brl->textRows;
+#ifdef _MSC_VER
+  unsigned char* dots = (unsigned char*)malloc(size * sizeof(*dots));
+#else /* _MSC_VER */
   unsigned char dots[size];
+#endif /* _MSC_VER */
 
   translateOutputCells(dots, text, size);
+#ifdef _MSC_VER
+  int writeResult = writeDots(brl, &brl->data->internal.port, dots);
+  free(dots);
+  return writeResult;
+#else /* _MSC_VER */
   return writeDots(brl, &brl->data->internal.port, dots);
+#endif /* _MSC_VER */
 }
 
 static size_t
 clearWindow (BrailleDisplay *brl) {
   size_t size = brl->textColumns * brl->textRows;
+#ifdef _MSC_VER
+  unsigned char* window = (unsigned char*)malloc(size * sizeof(*window));
+#else /* _MSC_VER */
   unsigned char window[size];
+#endif /* _MSC_VER */
 
   memset(window, 0, sizeof(window));
+#ifdef _MSC_VER
+  int writeResult = writeWindow(brl, window);
+  free(window);
+  return writeResult;
+#else /* _MSC_VER */
   return writeWindow(brl, window);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -1539,12 +1586,21 @@ enterPacketForwardMode (BrailleDisplay *brl) {
              brl->data->external.port.speed);
 
   {
-    char msg[brl->textColumns+1];
+#ifdef _MSC_VER
+      char* msg = (char*)malloc((brl->textColumns + 1) * sizeof(*msg));
+#else /* _MSC_VER */
+      char msg[brl->textColumns + 1];
+#endif /* _MSC_VER */
+
 
     snprintf(msg, sizeof(msg), "%s (%s)",
              gettext("PC mode"),
              gettext(brl->data->external.protocol->protocolName));
     message(NULL, msg, MSG_NODELAY);
+#ifdef _MSC_VER
+    free(msg);
+#endif /* _MSC_VER */
+
   }
 
   if (!brl->data->external.protocol->beginForwarding(brl)) return 0;
@@ -1910,7 +1966,11 @@ brl_construct (BrailleDisplay *brl, char **parameters, const char *device) {
       if (brl->data->isEmbedded) {
         {
           const char *parameter = parameters[PARM_PROTOCOL];
+#ifdef _MSC_VER
+          char* choices = (char*)malloc((protocolCount + 1) * sizeof(*choices));
+#else /* _MSC_VER */
           const char *choices[protocolCount + 1];
+#endif /* _MSC_VER */
           unsigned int choice;
 
           for (choice=0; choice<protocolCount; choice+=1) {
@@ -1925,6 +1985,10 @@ brl_construct (BrailleDisplay *brl, char **parameters, const char *device) {
 
           setExternalProtocol(brl, choice);
           logMessage(LOG_INFO, "External Protocol: %s", brl->data->external.protocol->protocolName);
+#ifdef _MSC_VER
+          free(choices);
+#endif /* _MSC_VER */
+
         }
 
         {

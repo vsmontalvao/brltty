@@ -51,7 +51,9 @@
 #include <curses.h>
 
 #else /* curses package */
+#ifndef _MSC_VER
 #warning curses package either unspecified or unsupported
+#endif /* _MSC_VER */
 #endif /* curses package */
 
 #ifdef __cplusplus

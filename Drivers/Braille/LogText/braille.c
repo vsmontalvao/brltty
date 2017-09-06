@@ -21,6 +21,14 @@
  * Author: Dave Mielke <dave@mielke.cc>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE lt
+#define DRIVER_NAME LogText
+#define DRIVER_COMMENT "32"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -169,7 +177,12 @@ sendBytes (const unsigned char *bytes, size_t count) {
 
 static int
 sendData (unsigned char line, unsigned char column, unsigned char count) {
-   unsigned char data[5 + count];
+#ifdef _MSC_VER
+    unsigned char* data = (unsigned char*)malloc((5 + count) * sizeof(*data));
+#else /* _MSC_VER */
+    unsigned char data[5 + count];
+#endif /* _MSC_VER */
+
    unsigned char *target = data;
    unsigned char *source = &targetImage[line][column];
    *target++ = 0XFF;
@@ -181,11 +194,26 @@ sendData (unsigned char line, unsigned char column, unsigned char count) {
    target = translateOutputCells(target, source, count);
    count = target - data;
    logBytes(LOG_DEBUG, "LogText write", data, count);
-   if (checkData(data, count)) {
-      if (sendBytes(data, count)) {
-         return 1;
-      }
+#ifdef _MSC_VER
+   int checkResult = checkData(data, count);
+   if (checkResult) {
+       int sendResult = sendBytes(data, count);
+       free(data);
+       if (sendResult) {
+           return 1;
+       }
    }
+   else {
+       free(data);
+   }
+#else /* _MSC_VER */
+   if (checkData(data, count)) {
+       if (sendBytes(data, count)) {
+           return 1;
+       }
+   }
+#endif /* _MSC_VER */
+
    return 0;
 }
 

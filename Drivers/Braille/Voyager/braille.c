@@ -41,6 +41,14 @@
  *   in-kernel USB driver.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE vo
+#define DRIVER_NAME Voyager
+#define DRIVER_COMMENT "44/70, Part232 (serial adapter), BraillePen/EasyLink"
+#define DRIVER_VERSION "0.3 (June 2009)"
+#define DRIVER_DEVELOPERS "Stéphane Doyon <s.doyon@videotron.ca>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -268,7 +276,12 @@ static const char *const serialDeviceNames[] = {"Serial Adapter", "Base Unit"};
 
 static int
 writeSerialPacket (BrailleDisplay *brl, unsigned char code, unsigned char *data, unsigned char count) {
-  unsigned char buffer[2 + (count * 2)];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((2 + (count * 2)) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[2 + (count * 2)];
+#endif /* _MSC_VER */
+
   unsigned char size = 0;
   unsigned char index;
 
@@ -279,7 +292,13 @@ writeSerialPacket (BrailleDisplay *brl, unsigned char code, unsigned char *data,
     if ((buffer[size++] = data[index]) == buffer[0])
       buffer[size++] = buffer[0];
 
+#ifdef _MSC_VER
+  int writeResult = writeBraillePacket(brl, NULL, buffer, size);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
   return writeBraillePacket(brl, NULL, buffer, size);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -490,13 +509,24 @@ setSerialDisplayState (BrailleDisplay *brl, unsigned char state) {
 
 static int
 writeSerialBraille (BrailleDisplay *brl, const unsigned char *cells, unsigned char count, unsigned char start) {
-  unsigned char buffer[2 + count];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((2 + count) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[2 + count];
+#endif /* _MSC_VER */
+
   unsigned char size = 0;
   buffer[size++] = start;
   buffer[size++] = count;
   memcpy(&buffer[size], cells, count);
   size += count;
+#ifdef _MSC_VER
+  int writeResult = writeSerialPacket(brl, 0X42, buffer, size);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
   return writeSerialPacket(brl, 0X42, buffer, size);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -798,7 +828,12 @@ writeBraille0 (BrailleDisplay *brl, const unsigned char *cells, unsigned char co
 static int
 writeBraille2 (BrailleDisplay *brl, const unsigned char *cells, unsigned char count, unsigned char start) {
   if (!deviceModel->partialUpdates) {
-    unsigned char buffer[count + 2];
+#ifdef _MSC_VER
+      unsigned char* buffer = (unsigned char*)malloc((count + 2) * sizeof(*buffer));
+#else /* _MSC_VER */
+      unsigned char buffer[count + 2];
+#endif /* _MSC_VER */
+
     WriteBrailleData wbd = {
       .from = {
         .cells = cells,
@@ -814,7 +849,13 @@ writeBraille2 (BrailleDisplay *brl, const unsigned char *cells, unsigned char co
 
     addHiddenCells(&wbd, 2);
     addActualCells(&wbd, 0);
+#ifdef _MSC_VER
+    int writeResult = protocol->writeBraille(brl, buffer, sizeof(buffer), 0);
+    free(buffer);
+    return writeResult;
+#else /* _MSC_VER */
     return protocol->writeBraille(brl, buffer, sizeof(buffer), 0);
+#endif /* _MSC_VER */
   }
 
   return protocol->writeBraille(brl, cells, count, start+2);
@@ -823,7 +864,12 @@ writeBraille2 (BrailleDisplay *brl, const unsigned char *cells, unsigned char co
 static int
 writeBraille4 (BrailleDisplay *brl, const unsigned char *cells, unsigned char count, unsigned char start) {
   if (!deviceModel->partialUpdates) {
-    unsigned char buffer[count + 4];
+#ifdef _MSC_VER
+      unsigned char* buffer = (unsigned char*)malloc((count + 4) * sizeof(*buffer));
+#else /* _MSC_VER */
+      unsigned char buffer[count + 4];
+#endif /* _MSC_VER */
+
     WriteBrailleData wbd = {
       .from = {
         .cells = cells,
@@ -841,7 +887,13 @@ writeBraille4 (BrailleDisplay *brl, const unsigned char *cells, unsigned char co
     addActualCells(&wbd, 6);
     addHiddenCells(&wbd, 2);
     addActualCells(&wbd, 0);
+#ifdef _MSC_VER
+    int writeResult = protocol->writeBraille(brl, buffer, sizeof(buffer), 0);
+    free(buffer);
+    return writeResult;
+#else /* _MSC_VER */
     return protocol->writeBraille(brl, buffer, sizeof(buffer), 0);
+#endif /* _MSC_VER */
   }
 
   if (start >= 6) {
@@ -853,7 +905,12 @@ writeBraille4 (BrailleDisplay *brl, const unsigned char *cells, unsigned char co
   }
 
   {
-    unsigned char buffer[count + 2];
+#ifdef _MSC_VER
+      unsigned char* buffer = (unsigned char*)malloc((count + 2) * sizeof(*buffer));
+#else /* _MSC_VER */
+      unsigned char buffer[count + 2];
+#endif /* _MSC_VER */
+
     WriteBrailleData wbd = {
       .from = {
         .cells = cells,
@@ -870,7 +927,13 @@ writeBraille4 (BrailleDisplay *brl, const unsigned char *cells, unsigned char co
     addActualCells(&wbd, 6-start);
     addHiddenCells(&wbd, 2);
     addActualCells(&wbd, 0);
-    return protocol->writeBraille(brl, buffer, sizeof(buffer), start+2);
+#ifdef _MSC_VER
+    int writeResult = protocol->writeBraille(brl, buffer, sizeof(buffer), start + 2);
+    free(buffer);
+    return writeResult;
+#else /* _MSC_VER */
+    return protocol->writeBraille(brl, buffer, sizeof(buffer), start + 2);
+#endif /* _MSC_VER */
   }
 }
 

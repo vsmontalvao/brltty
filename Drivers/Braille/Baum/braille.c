@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE bm
+#define DRIVER_NAME Baum
+#define DRIVER_COMMENT "BrailleConnect 12/24/32/40/64/80, Brailliant 24/32/40/64/80, Conny 12, DM80 Plus, EcoVario 24/32/40/64/80, Inka, Orbit 20, PocketVario 24, Pronto! V3 18/40, Pronto! V4 18/40, RBT 40/80, Refreshabraille 18, SuperVario 32/40/64/80, Vario 40/80, VarioConnect 12/24/32/40/64/80, VarioPro 40/64/80, VarioUltra 20/32/40"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -400,7 +408,11 @@ updateKeyGroup (
   unsigned char *old, const unsigned char *new,
   KeyGroup group, KeyNumber base, unsigned char count, int scaled
 ) {
-  KeyNumber pressTable[count];
+#ifdef _MSC_VER
+    KeyNumber* pressTable = (KeyNumber*) malloc(count * sizeof(*pressTable));
+#else /* _MSC_VER */
+    KeyNumber pressTable[count];
+#endif /* _MSC_VER */
   unsigned char pressCount = 0;
   unsigned char offset;
 
@@ -420,6 +432,9 @@ updateKeyGroup (
   }
 
   while (pressCount) enqueueKeyEvent(brl, group, pressTable[--pressCount], 1);
+#ifdef _MSC_VER
+  free(pressTable);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -1285,7 +1300,11 @@ getBaumPacket (BrailleDisplay *brl, BaumResponsePacket *packet) {
 
 static int
 writeBaumPacket (BrailleDisplay *brl, const unsigned char *packet, int length) {
-  unsigned char buffer[1 + (length * 2)];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((1 + (length * 2)) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[1 + (length * 2)];
+#endif /* _MSC_VER */
   unsigned char *byte = buffer;
   *byte++ = ESC;
 
@@ -1296,7 +1315,13 @@ writeBaumPacket (BrailleDisplay *brl, const unsigned char *packet, int length) {
         *byte++ = ESC;
   }
 
+#ifdef _MSC_VER
+  int result = writeBraillePacket(brl, NULL, buffer, (byte - buffer));
+  free(buffer);
+  return result;
+#else /* _MSC_VER */
   return writeBraillePacket(brl, NULL, buffer, (byte - buffer));
+#endif /* _MSC_VER */
 }
 
 static int
@@ -1329,7 +1354,11 @@ writeBaumDataRegisters (
     if (count < bmd->cellCount) count = bmd->cellCount;
 
     if (count) {
-      unsigned char packet[2 + 7 + count];
+#ifdef _MSC_VER
+        unsigned char* packet = (unsigned char*) malloc((2 + 7 + count) * sizeof(*packet));
+#else /* _MSC_VER */
+        unsigned char packet[2 + 7 + count];
+#endif /* _MSC_VER */
       unsigned char *byte = packet;
 
       *byte++ = BAUM_REQ_DataRegisters;
@@ -1346,7 +1375,13 @@ writeBaumDataRegisters (
       *byte++ = count;
       byte = mempcpy(byte, registers, count);
 
-      if (!writeBaumPacket(brl, packet, byte-packet)) return 0;
+#ifdef _MSC_VER
+      int writeResult = writeBaumPacket(brl, packet, byte - packet);
+      free(packet);
+      if (!writeResult) return 0;
+#else /* _MSC_VER */
+      if (!writeBaumPacket(brl, packet, byte - packet)) return 0;
+#endif /* _MSC_VER */
     }
   }
 
@@ -1361,25 +1396,45 @@ typedef struct {
 
 static int
 writeBaumCells_all (BrailleDisplay *brl) {
-  unsigned char packet[1 + cellCount];
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*)malloc((1 + cellCount) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[1 + cellCount];
+#endif /* _MSC_VER */
   unsigned char *byte = packet;
 
   *byte++ = BAUM_REQ_DisplayData;
   byte = mempcpy(byte, externalCells, cellCount);
 
-  return writeBaumPacket(brl, packet, byte-packet);
+#ifdef _MSC_VER
+  int writeResult = writeBaumPacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBaumPacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static int
 writeBaumCells_start (BrailleDisplay *brl) {
-  unsigned char packet[1 + 1 + cellCount];
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*)malloc((1 + 1 + cellCount) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[1 + 1 + cellCount];
+#endif /* _MSC_VER */
   unsigned char *byte = packet;
 
   *byte++ = BAUM_REQ_DisplayData;
   *byte++ = 0;
   byte = mempcpy(byte, externalCells, cellCount);
 
-  return writeBaumPacket(brl, packet, byte-packet);
+#ifdef _MSC_VER
+  int writeResult = writeBaumPacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBaumPacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -1643,7 +1698,11 @@ handleBaumDataRegistersEvent (BrailleDisplay *brl, const BaumResponsePacket *pac
 
 static int
 getIdentityCellCount (char* deviceIdentity, const int length) {
-  char buffer[length+1];
+#ifdef _MSC_VER
+    char* buffer = (char*)malloc((length + 1) * sizeof(*buffer));
+#else /* _MSC_VER */
+    char buffer[length + 1];
+#endif /* _MSC_VER */
   memcpy(buffer, deviceIdentity, length);
   buffer[length] = 0;
 
@@ -1651,9 +1710,20 @@ getIdentityCellCount (char* deviceIdentity, const int length) {
 
   if (digits) {
     int count = atoi(digits);
+#ifdef _MSC_VER
+    if (isAcceptableCellCount(count))
+    {
+        free(buffer);
+        return count;
+    }
+#else /* _MSC_VER */
     if (isAcceptableCellCount(count)) return count;
+#endif /* _MSC_VER */
   }
 
+#ifdef _MSC_VER
+free(buffer);
+#endif /* _MSC_VER */
   return 0;
 }
 
@@ -2239,13 +2309,24 @@ processHidPackets (BrailleDisplay *brl) {
 
 static int
 writeHidCells (BrailleDisplay *brl) {
-  unsigned char packet[1 + cellCount];
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*) malloc((1 + cellCount) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[1 + cellCount];
+#endif /* _MSC_VER */
   unsigned char *byte = packet;
 
   *byte++ = BAUM_REQ_DisplayData;
   byte = mempcpy(byte, externalCells, cellCount);
 
-  return writeHidPacket(brl, packet, byte-packet);
+
+#ifdef _MSC_VER
+  int writeResult = writeHidPacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeHidPacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -2506,7 +2587,12 @@ processHandyTechPackets (BrailleDisplay *brl) {
 
 static int
 writeHandyTechCells (BrailleDisplay *brl) {
-  unsigned char packet[1 + ht->statusCount + ht->textCount];
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*)malloc((1 + ht->statusCount + ht->textCount) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[1 + ht->statusCount + ht->textCount];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
 
   *byte++ = HT_REQ_WRITE;
@@ -2518,7 +2604,14 @@ writeHandyTechCells (BrailleDisplay *brl) {
 
   byte = mempcpy(byte, externalCells, ht->textCount);
 
-  return writeHandyTechPacket(brl, packet, byte-packet);
+
+#ifdef _MSC_VER
+  int writeResult = writeHandyTechPacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeHandyTechPacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -2676,14 +2769,25 @@ getPowerBraillePacket (BrailleDisplay *brl, PowerBrailleResponsePacket *packet) 
 
 static int
 writePowerBraillePacket (BrailleDisplay *brl, const unsigned char *packet, int length) {
-  unsigned char buffer[2 + length];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((2 + length) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[2 + length];
+#endif /* _MSC_VER */
+
   unsigned char *byte = buffer;
 
   *byte++ = 0XFF;
   *byte++ = 0XFF;
   byte = mempcpy(byte, packet, length);
 
+#ifdef _MSC_VER
+  int writeResult = writeBraillePacket(brl, NULL, buffer, (byte - buffer));
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
   return writeBraillePacket(brl, NULL, buffer, (byte - buffer));
+#endif /* _MSC_VER */
 }
 
 static int
@@ -2791,7 +2895,11 @@ processPowerBraillePackets (BrailleDisplay *brl) {
 
 static int
 writePowerBrailleCells (BrailleDisplay *brl) {
-  unsigned char packet[6 + (brl->textColumns * 2)];
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*) malloc((6 + (brl->textColumns * 2)) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[6 + (brl->textColumns * 2)];
+#endif /* _MSC_VER */
   unsigned char *byte = packet;
 
   *byte++ = PB_REQ_WRITE;
@@ -2809,7 +2917,13 @@ writePowerBrailleCells (BrailleDisplay *brl) {
     }
   }
 
-  return writePowerBraillePacket(brl, packet, byte-packet);
+#ifdef _MSC_VER
+  int writeResult = writePowerBraillePacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePowerBraillePacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static int

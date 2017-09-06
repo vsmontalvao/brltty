@@ -145,8 +145,13 @@ main (int argc, char *argv[]) {
 #ifdef __MINGW32__
   {
     static SERVICE_TABLE_ENTRY serviceTable[] = {
-      { .lpServiceName="", .lpServiceProc=serviceMain },
-      {}
+#ifdef _MSC_VER
+        { .lpServiceName = "",.lpServiceProc = serviceMain }
+#else /* _MSC_VER */
+    {.lpServiceName = "", .lpServiceProc = serviceMain },
+    {}
+#endif /* _MSC_VER */
+
     };
 
     isWindowsService = 1;

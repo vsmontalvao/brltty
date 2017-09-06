@@ -27,9 +27,10 @@ extern "C" {
 
 #define WIN_PROC_STUB(name) typeof(name) (*name##Proc)
 
-
+#ifndef _MSC_VER
 /* ntdll.dll */
 #include <ntdef.h>
+#endif /* _MSC_VER */
 
 #ifndef STATUS_SUCCESS
 #include <ntstatus.h>

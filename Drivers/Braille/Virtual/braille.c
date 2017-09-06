@@ -16,15 +16,28 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE vr
+#define DRIVER_NAME Virtual
+#define DRIVER_COMMENT "TCP/Unix, client/server"
+#define DRIVER_VERSION "0.1"
+#define DRIVER_DEVELOPERS "Mario Lang <mlang@delysid.org>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
 #include <string.h>
+
+#ifndef _MSC_VER
 #include <strings.h>
+#endif /* _MSC_VER */
+
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 
+#ifndef _MSC_VER
 #ifdef __MINGW32__
 #include <ws2tcpip.h>
 #include "system_windows.h"
@@ -35,6 +48,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #endif /* __MINGW32__ */
+#endif /* _MSC_VER */
 
 #if !defined(AF_LOCAL) && defined(AF_UNIX)
 #define AF_LOCAL AF_UNIX
@@ -48,12 +62,14 @@
 #undef AF_LOCAL
 #endif /* WINDOWS */
 
+#ifndef _MSC_VER
 #ifdef __MINGW32__
 #define close(fd) CloseHandle((HANDLE)(fd))
 #define LogSocketError(msg) logWindowsSocketError(msg)
 #else /* __MINGW32__ */
 #define LogSocketError(msg) logSystemError(msg)
 #endif /* __MINGW32__ */
+#endif /* _MSC_VER */
 
 #include "log.h"
 #include "io_misc.h"
@@ -152,10 +168,17 @@ formatSocketAddress (const struct sockaddr *address) {
       const struct sockaddr_in *inetAddress = (const struct sockaddr_in *)address;
       const char *host = inet_ntoa(inetAddress->sin_addr);
       unsigned short port = ntohs(inetAddress->sin_port);
+#ifdef _MSC_VER
+      unsigned char* buffer = (unsigned char*)malloc((strlen(host) + 7) * sizeof(*buffer));
+#else /* _MSC_VER */
       char buffer[strlen(host) + 7];
+#endif /* _MSC_VER */
 
       snprintf(buffer, sizeof(buffer), "%s:%u", host, port);
       string = strdup(buffer);
+#ifdef _MSC_VER
+      free(buffer);
+#endif /* _MSC_VER */
       break;
     }
 

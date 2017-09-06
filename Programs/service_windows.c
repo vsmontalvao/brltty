@@ -21,7 +21,9 @@
 #include "log.h"
 #include "pgmpath.h"
 #include "service.h"
+#ifndef _MSC_VER
 #include "system_windows.h"
+#endif /* _MSC_VER */
 
 int
 installService (const char *name, const char *description) {

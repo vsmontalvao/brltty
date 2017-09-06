@@ -20,6 +20,14 @@
  * driver is similar to the Vario-HT one.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE vd
+#define DRIVER_NAME VideoBraille
+#define DRIVER_COMMENT "40"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS ""
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -129,7 +137,11 @@ static void brl_destruct(BrailleDisplay *brl) {
 
 static int brl_writeWindow(BrailleDisplay *brl, const wchar_t *text) {
   const size_t cells = 40;
+#ifdef _MSC_VER
+  unsigned char* outbuff = (unsigned char*)malloc(cells * sizeof(*outbuff));
+#else /* _MSC_VER */
   unsigned char outbuff[cells];
+#endif /* _MSC_VER */
 
   /* Only display something if the data actually differs, this 
   *  could most likely cause some problems in redraw situations etc
@@ -141,6 +153,9 @@ static int brl_writeWindow(BrailleDisplay *brl, const wchar_t *text) {
     vbdisplay(outbuff);
     brl->writeDelay += VBREFRESHDELAY;
   }
+#ifdef _MSC_VER
+  free(outbuff);
+#endif /* _MSC_VER */
   return 1;
 }
 

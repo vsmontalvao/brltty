@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE sk
+#define DRIVER_NAME Seika
+#define DRIVER_COMMENT "3/4/5 (40), 80, Mini (16)"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -194,7 +202,12 @@ ntvWriteCells40 (BrailleDisplay *brl) {
     0X00
   };
 
-  unsigned char packet[sizeof(header) + (brl->textColumns*2)];
+#ifdef _MSC_VER
+  unsigned char* packet = (unsigned char*)malloc((sizeof(header) + (brl->textColumns * 2)) * sizeof(*packet));
+#else /* _MSC_VER */
+  unsigned char packet[sizeof(header) + (brl->textColumns * 2)];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
 
   byte = mempcpy(byte, header, sizeof(header));
@@ -208,7 +221,13 @@ ntvWriteCells40 (BrailleDisplay *brl) {
     }
   }
 
-  return writePacket(brl, packet, byte-packet);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -219,12 +238,23 @@ ntvWriteCells80 (BrailleDisplay *brl) {
     0X00, 0X00, 0X00
   };
 
+#ifdef _MSC_VER
+  unsigned char* packet = (unsigned char*)malloc((sizeof(header) + brl->textColumns) * sizeof(*packet));
+#else /* _MSC_VER */
   unsigned char packet[sizeof(header) + brl->textColumns];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
 
   byte = mempcpy(byte, header, sizeof(header));
   byte = translateOutputCells(byte, textCells, brl->textColumns);
-  return writePacket(brl, packet, byte-packet);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 typedef struct {
@@ -461,7 +491,12 @@ pbcWriteCells (BrailleDisplay *brl) {
     0X00, 0X63, 0X00
   };
 
+#ifdef _MSC_VER
+  unsigned char* packet = (unsigned char*)malloc((sizeof(header) + 2 + (brl->textColumns * 2)) * sizeof(*packet));
+#else /* _MSC_VER */
   unsigned char packet[sizeof(header) + 2 + (brl->textColumns * 2)];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
 
   byte = mempcpy(byte, header, sizeof(header));
@@ -476,7 +511,13 @@ pbcWriteCells (BrailleDisplay *brl) {
     }
   }
 
-  return writePacket(brl, packet, byte-packet);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static const ProtocolOperations pbcProtocolOperations = {
@@ -625,14 +666,25 @@ ntkWriteIdentifyRequest (BrailleDisplay *brl) {
 static int
 ntkWriteCells (BrailleDisplay *brl) {
   static const unsigned char header[] = {0XFF, 0XFF, 0XA3};
+#ifdef _MSC_VER
+  unsigned char* packet = (unsigned char*)malloc((sizeof(header) + 1 + brl->textColumns) * sizeof(*packet));
+#else /* _MSC_VER */
   unsigned char packet[sizeof(header) + 1 + brl->textColumns];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
 
   byte = mempcpy(byte, header, sizeof(header));
   *byte++ = brl->textColumns;
   byte = translateOutputCells(byte, textCells, brl->textColumns);
 
-  return writePacket(brl, packet, byte-packet);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static const ProtocolOperations ntkProtocolOperations = {
@@ -774,7 +826,12 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
 
 static void
 processKeys (BrailleDisplay *brl, KeyNumberSet keys, const unsigned char *routing) {
-  KeyValue pressedKeys[keyCount + routingCount];
+#ifdef _MSC_VER
+    KeyValue* pressedKeys = (KeyValue*)malloc((keyCount + routingCount) * sizeof(*pressedKeys));
+#else /* _MSC_VER */
+    KeyValue pressedKeys[keyCount + routingCount];
+#endif /* _MSC_VER */
+
   unsigned int pressedCount = 0;
 
   if (keys) {
@@ -823,6 +880,10 @@ processKeys (BrailleDisplay *brl, KeyNumberSet keys, const unsigned char *routin
     KeyValue *kv = &pressedKeys[--pressedCount];
     enqueueKeyEvent(brl, kv->group, kv->number, 0);
   }
+
+#ifdef _MSC_VER
+  free(pressedKeys);
+#endif /* _MSC_VER */
 }
 
 static int

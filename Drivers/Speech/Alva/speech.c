@@ -20,6 +20,14 @@
  * For the Alva Delphi.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE al
+#define DRIVER_NAME Alva
+#define DRIVER_COMMENT "Delphi(4nn)"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS ""
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

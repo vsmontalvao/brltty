@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE hw
+#define DRIVER_NAME HumanWare
+#define DRIVER_COMMENT "Brailliant 32/40/80 bi"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -553,7 +561,11 @@ probeHidDisplay (BrailleDisplay *brl) {
 
 static int
 writeHidCells (BrailleDisplay *brl, const unsigned char *cells, unsigned char count) {
-  unsigned char buffer[4 + count];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((4 + count) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[4 + count];
+#endif /* _MSC_VER */
   unsigned char *byte = buffer;
 
   *byte++ = HW_REP_OUT_WriteCells;
@@ -562,7 +574,13 @@ writeHidCells (BrailleDisplay *brl, const unsigned char *cells, unsigned char co
   *byte++ = count;
   byte = mempcpy(byte, cells, count);
 
-  return writeHidReport(brl, buffer, byte-buffer);
+#ifdef _MSC_VER
+  int writeResult = writeHidReport(brl, buffer, byte - buffer);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeHidReport(brl, buffer, byte - buffer);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -715,10 +733,20 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
   const size_t count = brl->textColumns;
 
   if (cellsHaveChanged(brl->data->text.cells, brl->buffer, count, NULL, NULL, &brl->data->text.rewrite)) {
-    unsigned char cells[count];
+#ifdef _MSC_VER
+      unsigned char* cells = (unsigned char*)malloc(count * sizeof(*cells));
+#else /* _MSC_VER */
+      unsigned char cells[count];
+#endif /* _MSC_VER */
 
     translateOutputCells(cells, brl->data->text.cells, count);
+#ifdef _MSC_VER
+    int writeResult = brl->data->protocol->writeCells(brl, cells, count);
+    free(cells);
+    if (!writeResult) return 0;
+#else /* _MSC_VER */
     if (!brl->data->protocol->writeCells(brl, cells, count)) return 0;
+#endif /* _MSC_VER */
   }
 
   return 1;

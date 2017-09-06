@@ -21,6 +21,14 @@
  * Author: Dave Mielke <dave@mielke.cc>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE bn
+#define DRIVER_NAME BrailleNote
+#define DRIVER_COMMENT "18/32, Apex"
+#define DRIVER_VERSION "1.0"
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -173,7 +181,11 @@ getPacket (BrailleDisplay *brl, ResponsePacket *packet) {
 
 static int
 writePacket (BrailleDisplay *brl, const unsigned char *packet, int size) {
-  unsigned char buffer[1 + (size * 2)];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*) malloc((1 + (size * 2)) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[1 + (size * 2)];
+#endif /* _MSC_VER */
   unsigned char *byte = buffer;
 
   *byte++ = BN_REQ_BEGIN;
@@ -183,18 +195,34 @@ writePacket (BrailleDisplay *brl, const unsigned char *packet, int size) {
     --size;
   }
 
-  return writeBraillePacket(brl, NULL, buffer, byte-buffer);
+#ifdef _MSC_VER
+  int writeResult = writeBraillePacket(brl, NULL, buffer, byte - buffer);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBraillePacket(brl, NULL, buffer, byte - buffer);
+#endif /* _MSC_VER */
 }
 
 static int
 refreshCells (BrailleDisplay *brl) {
-  unsigned char buffer[1 + cellCount];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*) malloc((1 + cellCount) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[1 + cellCount];
+#endif /* _MSC_VER */
   unsigned char *byte = buffer;
 
   *byte++ = BN_REQ_WRITE;
   byte = translateOutputCells(byte, cellBuffer, cellCount);
 
-  return writePacket(brl, buffer, byte-buffer);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, buffer, byte - buffer);
+  fre(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePacket(brl, buffer, byte - buffer);
+#endif /* _MSC_VER */
 }
 
 static unsigned char

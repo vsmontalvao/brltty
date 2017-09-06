@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE ce
+#define DRIVER_NAME Cebra
+#define DRIVER_COMMENT "20/40/60/80/100/120/140"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -190,7 +198,11 @@ writeBytes (BrailleDisplay *brl, const unsigned char *bytes, size_t count) {
 
 static int
 writePacket (BrailleDisplay *brl, unsigned char type, size_t size, const unsigned char *data) {
-  unsigned char bytes[size + 5];
+#ifdef _MSC_VER
+    unsigned char* bytes = (unsigned char*)malloc((size + 5) * sizeof(*bytes));
+#else /* _MSC_VER */
+    unsigned char bytes[size + 5];
+#endif /* _MSC_VER */
   unsigned char *byte = bytes;
 
   *byte++ = CE_PKT_BEGIN;
@@ -200,7 +212,13 @@ writePacket (BrailleDisplay *brl, unsigned char type, size_t size, const unsigne
   byte = mempcpy(byte, data, size);
   *byte++ = CE_PKT_END;
 
-  return writeBytes(brl, bytes, byte-bytes);
+#ifdef _MSC_VER
+  int writeResult = writeBytes(brl, bytes, byte - bytes);
+  free(bytes);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBytes(brl, bytes, byte - bytes);
+#endif /* _MSC_VER */
 }
 
 static BraillePacketVerifierResult
@@ -344,10 +362,20 @@ static int
 brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
   if (!brl->data->acknowledgementPending) {
     if (cellsHaveChanged(brl->data->textCells, brl->buffer, brl->textColumns, NULL, NULL, &brl->data->forceRewrite)) {
-      unsigned char cells[brl->textColumns];
+#ifdef _MSC_VER
+        unsigned char* cells = (unsigned char*) malloc((brl->textColumns) * sizeof(*cells));
+#else /* _MSC_VER */
+        unsigned char cells[brl->textColumns];
+#endif /* _MSC_VER */
 
       translateOutputCells(cells, brl->data->textCells, brl->textColumns);
+#ifdef _MSC_VER
+      int writeResult = writePacket(brl, CE_PKT_REQ_Write, brl->textColumns, cells);
+      free(cells);
+      if (!writeResult) return 0;
+#else /* _MSC_VER */
       if (!writePacket(brl, CE_PKT_REQ_Write, brl->textColumns, cells)) return 0;
+#endif /* _MSC_VER */
       brl->data->acknowledgementPending = 1;
     }
   }

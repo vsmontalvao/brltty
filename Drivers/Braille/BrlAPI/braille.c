@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE ba
+#define DRIVER_NAME BrlAPI
+#define DRIVER_COMMENT ""
+#define DRIVER_VERSION "0.1, 2005"
+#define DRIVER_DEVELOPERS "Sébastien Hinderer <Sebastien.Hinderer@ens-lyon.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -135,7 +143,11 @@ static int brl_writeWindow(BrailleDisplay *brl, const wchar_t *text)
       return 1;
     }
 
+#ifdef _MSC_VER
+    unsigned char* and = (unsigned char*) malloc(displaySize * sizeof(*and));
+#else /* _MSC_VER */
     unsigned char and[displaySize];
+#endif /* _MSC_VER */
     memset(and, 0, sizeof(and));
     arguments.andMask = and;
     arguments.orMask = brl->buffer;

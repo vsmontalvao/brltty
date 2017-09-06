@@ -27,6 +27,7 @@
 #include "lock.h"
 #include "program.h"
 
+#ifndef _MSC_VER
 #if defined(__MINGW32__)
 #include "system_windows.h"
 
@@ -36,6 +37,7 @@
 #else /* unix */
 #include <locale.h>
 #endif /* locale definitions */
+#endif /* _MSC_VER */
 
 const char defaultCharset[] = "ISO-8859-1";
 

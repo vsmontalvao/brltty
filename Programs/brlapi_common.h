@@ -26,6 +26,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+#ifndef _MSC_VER
 #ifdef __MINGW32__
 #include <io.h>
 #else /* __MINGW32__ */
@@ -34,6 +35,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif /* __MINGW32__ */
+#endif /* _MSC_VER */
 
 #ifdef _MSC_VER
 #define strdup _strdup
@@ -257,7 +259,7 @@ static int BRLAPI(loadAuthKey)(const char *filename, size_t *authlength, void *a
 
   stsize = MIN(statbuf.st_size, BRLAPI_MAXPACKETSIZE-2*sizeof(uint32_t));
 
-  if ((fd = open(filename, O_RDONLY)) <0) {
+  if ((fd = _open(filename, O_RDONLY)) <0) {
     LibcError("open in loadAuthKey");
     return -1;
   }
@@ -272,11 +274,11 @@ static int BRLAPI(loadAuthKey)(const char *filename, size_t *authlength, void *a
 
   if (*authlength!=(size_t)stsize) {
     LibcError("read in loadAuthKey");
-    close(fd);
+    _close(fd);
     return -1;
   }
 
-  close(fd);
+  _close(fd);
   return 0;
 }
 
@@ -442,4 +444,5 @@ BRLAPI(getKeyFile)(const char *auth)
     *delim = 0;
   return ret;
 }
+
 

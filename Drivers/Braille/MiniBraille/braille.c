@@ -27,6 +27,14 @@
  * Thanks to Tieman B.V., which gives me protocol information. Author.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE mn
+#define DRIVER_NAME MiniBraille
+#define DRIVER_COMMENT "20"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Brailcom o.p.s. <technik@brailcom.cz>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

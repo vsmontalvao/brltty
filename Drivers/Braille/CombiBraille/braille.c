@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE cb
+#define DRIVER_NAME CombiBraille
+#define DRIVER_COMMENT "25/45/85"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Nikhil Nair"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -198,7 +206,11 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
   /* Only refresh display if the data has changed: */
   if (textChanged || statusChanged) {
     static const unsigned char header[] = {ESC, 'B'};
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*) malloc((sizeof(header) + ((brl->statusColumns + brl->textColumns) * 2)) * sizeof(*buffer));
+#else /* _MSC_VER */
     unsigned char buffer[sizeof(header) + ((brl->statusColumns + brl->textColumns) * 2)];
+#endif /* _MSC_VER */
     unsigned char *byte = buffer;
     int i;			/* loop counter */
 
@@ -221,6 +233,10 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
       serialWriteData(CB_serialDevice, buffer, size);
       brl->writeDelay += (size * 1000 / CB_charactersPerSecond) + 1;
     }
+
+#ifdef _MSC_VER
+    free(buffer);
+#endif /* _MSC_VER */
   }
 
   return 1;

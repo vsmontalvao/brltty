@@ -46,6 +46,7 @@ Samuel Thibault <samuel.thibault@ens-lyon.org>"
 #include <iconv.h>
 #endif /* HAVE_ICONV_H */
 
+#ifndef _MSC_VER
 #ifdef __MINGW32__
 #include "system_windows.h"
 #include "win_pthread.h"
@@ -72,6 +73,7 @@ Samuel Thibault <samuel.thibault@ens-lyon.org>"
 #include <sys/time.h>
 #endif /* HAVE_SYS_SELECT_H */
 #endif /* __MINGW32__ */
+#endif /* _MSC_VER */
 
 #define BRLAPI_NO_DEPRECATED
 #include "brlapi.h"
@@ -2240,8 +2242,13 @@ THREAD_FUNCTION(runServer) {
     socketInfo[i].fd = INVALID_FILE_DESCRIPTOR;
 
 #ifdef __MINGW32__
-  if ((getaddrinfoProc && WSAStartup(MAKEWORD(2,0), &wsadata))
-	|| (!getaddrinfoProc && WSAStartup(MAKEWORD(1,1), &wsadata))) {
+#ifdef _MSC_VER
+  if ((getaddrinfo && WSAStartup(MAKEWORD(2, 0), &wsadata))
+      || (!getaddrinfo && WSAStartup(MAKEWORD(1, 1), &wsadata))) {
+#else /* _MSC_VER */
+  if ((getaddrinfoProc && WSAStartup(MAKEWORD(2, 0), &wsadata))
+      || (!getaddrinfoProc && WSAStartup(MAKEWORD(1, 1), &wsadata))) {
+#endif /* _MSC_VER */
     logWindowsSocketError("Starting socket library");
     goto finished;
   }

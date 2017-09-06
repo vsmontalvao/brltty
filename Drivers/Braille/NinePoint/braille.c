@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE np
+#define DRIVER_NAME NinePoint
+#define DRIVER_COMMENT "8"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -220,7 +228,12 @@ brl_destruct (BrailleDisplay *brl) {
 static int
 brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
   if (cellsHaveChanged(brl->data->textCells, brl->buffer, brl->textColumns, NULL, NULL, &brl->data->forceRewrite)) {
+#ifdef _MSC_VER
+    unsigned char* bytes = (unsigned char*)malloc(((brl->textColumns * 2) + 2) * sizeof(*bytes));
+#else /* _MSC_VER */
     unsigned char bytes[(brl->textColumns * 2) + 2];
+#endif /* _MSC_VER */
+
     unsigned char *byte = bytes;
 
     {
@@ -235,7 +248,13 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
     *byte++ = 0XFD;
     *byte++ = 0X10;
 
-    if (!writeBytes(brl, bytes, byte-bytes)) return 0;
+#ifdef _MSC_VER
+    int writeResult = writeBytes(brl, bytes, byte - bytes);
+    free(bytes);
+    if (!writeResult) return 0;
+#else /* _MSC_VER */
+    if (!writeBytes(brl, bytes, byte - bytes)) return 0;
+#endif /* _MSC_VER */
   }
 
   return 1;

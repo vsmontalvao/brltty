@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE bd
+#define DRIVER_NAME Braudi
+#define DRIVER_COMMENT "Pro"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -76,14 +84,24 @@ static int
 writeCells (BrailleDisplay *brl) {
   static const unsigned char header[] = {'D'};
   static const unsigned char trailer[] = {CR};
+#ifdef _MSC_VER
+  unsigned char* buffer = (unsigned char*) malloc((sizeof(header) + brl->textColumns + sizeof(trailer)) * sizeof(*buffer));
+#else /* _MSC_VER */
   unsigned char buffer[sizeof(header) + brl->textColumns + sizeof(trailer)];
+#endif /* _MSC_VER */
   unsigned char *byte = buffer;
 
   byte = mempcpy(byte, header, sizeof(header));
   byte = translateOutputCells(byte, outputBuffer, brl->textColumns);
   byte = mempcpy(byte, trailer, sizeof(trailer));
 
-  return writeBytes(brl, buffer, byte-buffer);
+#ifdef _MSC_VER
+  int writeResult = writeBytes(brl, buffer, byte - buffer);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBytes(brl, buffer, byte - buffer);
+#endif /* _MSC_VER */
 }
 
 static int

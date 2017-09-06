@@ -46,6 +46,7 @@ extern int serialMonitorInput (SerialDevice *serial, AsyncMonitorCallback *callb
 extern int serialAwaitInput (SerialDevice *serial, int timeout);
 extern int serialAwaitOutput (SerialDevice *serial);
 
+//#ifndef _MSC_VER
 extern ssize_t serialReadData (
   SerialDevice *serial,
   void *buffer, size_t size,
@@ -62,6 +63,7 @@ extern ssize_t serialWriteData (
   SerialDevice *serial,
   const void *data, size_t size
 );
+//#endif /* _MSC_VER */
 
 extern int serialParseBaud (unsigned int *baud, const char *string);
 extern int serialParseDataBits (unsigned int *bits, const char *string);

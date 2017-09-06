@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE pg
+#define DRIVER_NAME Pegasus
+#define DRIVER_COMMENT "20/27/40/80"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -271,13 +279,25 @@ static int
 writeCells (BrailleDisplay *brl) {
   unsigned int textCount = brl->textColumns;
   unsigned int statusCount = brl->statusColumns;
+#ifdef _MSC_VER
+  unsigned char* cells = (unsigned char*)malloc((textCount + statusCount) * sizeof(*cells));
+#else /* _MSC_VER */
   unsigned char cells[textCount + statusCount];
+#endif /* _MSC_VER */
+
   unsigned char *cell = cells;
 
   while (textCount) *cell++ = translateOutputCell(textCells[--textCount]);
   while (statusCount) *cell++ = translateOutputCell(statusCells[--statusCount]);
 
-  return io->methods->writeCells(brl, cells, cell-cells);
+#ifdef _MSC_VER
+  int writeResult = io->methods->writeCells(brl, cells, cell - cells);
+  free(cells);
+  return writeResult;
+#else /* _MSC_VER */
+  return io->methods->writeCells(brl, cells, cell - cells);
+#endif /* _MSC_VER */
+
 }
 
 static void
@@ -358,14 +378,25 @@ writeSerialCells (BrailleDisplay *brl, const unsigned char *cells, unsigned int 
   static const unsigned char header[] = {0X40, 0X50, 0X4F};
   static const unsigned char trailer[] = {0X18, 0X20, 0X20};
 
+#ifdef _MSC_VER
+  unsigned char* buffer = (unsigned char*)malloc((sizeof(header) + count + sizeof(trailer)) * sizeof(*buffer));
+#else /* _MSC_VER */
   unsigned char buffer[sizeof(header) + count + sizeof(trailer)];
+#endif /* _MSC_VER */
+
   unsigned char *byte = buffer;
 
   byte = mempcpy(byte, header, sizeof(header));
   byte = mempcpy(byte, cells, count);
   byte = mempcpy(byte, trailer, sizeof(trailer));
 
-  return writeBytes(brl, buffer, byte-buffer);
+#ifdef _MSC_VER
+  int writeResult = writeBytes(brl, buffer, byte - buffer);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBytes(brl, buffer, byte - buffer);
+#endif /* _MSC_VER */
 }
 
 static const InputOutputMethods serialMethods = {
@@ -452,13 +483,23 @@ identifyUsbModel (BrailleDisplay *brl) {
 
 static int
 writeUsbCells (BrailleDisplay *brl, const unsigned char *cells, unsigned int count) {
-  unsigned char buffer[1 + count];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc((1 + count) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[1 + count];
+#endif /* _MSC_VER */
   unsigned char *byte = buffer;
 
   *byte++ = 0X43;
   byte = mempcpy(byte, cells, count);
 
-  return writeBytes(brl, buffer, byte-buffer);
+#ifdef _MSC_VER
+  int writeResult = writeBytes(brl, buffer, byte - buffer);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBytes(brl, buffer, byte - buffer);
+#endif /* _MSC_VER */
 }
 
 static const InputOutputMethods usbMethods = {

@@ -2308,7 +2308,11 @@ exitPidFile (void *data) {
 #if defined(GRUB_RUNTIME)
 
 #else /* remove pid file */
-  unlink(opt_pidFile);
+#ifndef _MSC_VER
+    _unlink(opt_pidFile);
+#else /* _MSC_VER */
+    _unlink(opt_pidFile);
+#endif /* _MSC_VER */
 #endif /* remove pid file */
 }
 

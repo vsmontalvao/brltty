@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE hd
+#define DRIVER_NAME Hedo
+#define DRIVER_COMMENT "ProfiLine, MobilLine"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -284,7 +292,12 @@ disconnectResource (BrailleDisplay *brl) {
 
 static int
 writeCells (BrailleDisplay *brl, int wait) {
-  unsigned char packet[1 + brl->data->model->statusCellCount + brl->data->model->textCellCount];
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*) malloc((1 + brl->data->model->statusCellCount + brl->data->model->textCellCount) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[1 + brl->data->model->statusCellCount + brl->data->model->textCellCount];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
 
   *byte++ = HD_REQ_WRITE_CELLS;
@@ -295,8 +308,17 @@ writeCells (BrailleDisplay *brl, int wait) {
     size_t count = byte - packet;
 
     if (wait) return writeBrailleMessage(brl, NULL, 0, packet, count);
+#ifdef _MSC_VER
+    int writeResult = writeBraillePacket(brl, NULL, packet, count);
+    free(packet);
+    return writeResult;
+#else /* _MSC_VER */
     return writeBraillePacket(brl, NULL, packet, count);
+#endif /* _MSC_VER */
   }
+#ifdef _MSC_VER
+  free(packet);
+#endif /* _MSC_VER */
 }
 
 static int

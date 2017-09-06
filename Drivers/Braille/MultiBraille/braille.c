@@ -52,6 +52,14 @@
    0: short beep
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE mb
+#define DRIVER_NAME MultiBraille
+#define DRIVER_COMMENT "MB125CR/MB145CR/MB185CR"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Wolfgang Astleitner"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

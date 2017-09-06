@@ -20,7 +20,11 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#ifndef _MSC_VER
 #include <strings.h>
+#endif /* _MSC_VER */
+
 #include <errno.h>
 #include <fcntl.h>
 
@@ -39,7 +43,11 @@ getConsole (void) {
 
   if (!console) {
     if ((console = fopen("/dev/console", "wb"))) {
-      logMessage(LOG_DEBUG, "console opened: fd=%d", fileno(console));
+#ifdef _MSC_VER
+        logMessage(LOG_DEBUG, "console opened: fd=%d", _fileno(console));
+#else /* _MSC_VER */
+        logMessage(LOG_DEBUG, "console opened: fd=%d", fileno(console));
+#endif /* _MSC_VER */
       registerProgramStream("console-stream", &console);
     } else {
       logSystemError("console open");

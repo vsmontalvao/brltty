@@ -21,6 +21,14 @@
  ** Made by Yannick PLASSIARD and Olivier BERT
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE eu
+#define DRIVER_NAME EuroBraille
+#define DRIVER_COMMENT "AzerBraille, Clio, Esys, Iris, NoteBraille, Scriba"
+#define DRIVER_VERSION "2.0"
+#define DRIVER_DEVELOPERS "Yannick PLASSIARD <yan@mistigri.org>, Olivier BERT <obert01@mistigri.org>, Nicolas PITRE <nico@fluxnic.net>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 typedef enum {
@@ -90,7 +98,11 @@ writeData_USB (BrailleDisplay *brl, const void *data, size_t length) {
     } else {
       memset(&report[count], 0X55, (sizeof(report) - count));
     }
-    memcpy(report, data+offset, count);
+#ifdef _MSC_VER
+    memcpy(report, (unsigned char*)data + offset, count);
+#else /* _MSC_VER */
+    memcpy(report, data + offset, count);
+#endif /* _MSC_VER */
 
     updateWriteDelay(brl, sizeof(report));
     if (gioSetHidReport(brl->gioEndpoint, 0, report, sizeof(report)) < 0) return -1;

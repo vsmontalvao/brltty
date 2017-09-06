@@ -84,7 +84,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\brltty;$(SolutionDir);$(SolutionDir)..\..\Headers;$(SolutionDir)..\..\Programs</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)..\brltty;$(SolutionDir)..\..;$(SolutionDir)..\..\Headers;$(SolutionDir)..\..\Programs</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_CONFIG_H;__MINGW32__;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;HAVE_STRING_H;HAVE_SDKDDKVER_H;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
@@ -408,6 +408,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Headers\prologue.h" />
+    <ClInclude Include="..\..\Programs\brlapi_common.h" />
     <ClInclude Include="config.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

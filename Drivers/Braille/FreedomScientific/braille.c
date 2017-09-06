@@ -21,6 +21,14 @@
  * Author: Dave Mielke <dave@mielke.cc>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE fs
+#define DRIVER_NAME FreedomScientific
+#define DRIVER_COMMENT "Focus 1 44/70/84, Focus 2 40/80, Focus Blue 14/40, PAC Mate 20/40"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -526,7 +534,11 @@ writeRequest (BrailleDisplay *brl) {
 
   if (brl->data->writeLast != -1) {
     unsigned int count = brl->data->writeLast + 1 - brl->data->writeFirst;
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*) malloc(count * sizeof(*buffer));
+#else /* _MSC_VER */
     unsigned char buffer[count];
+#endif /* _MSC_VER */
     int truncate = count > brl->data->outputPayloadLimit;
 
     if (truncate) count = brl->data->outputPayloadLimit;
@@ -545,6 +557,10 @@ writeRequest (BrailleDisplay *brl) {
       brl->data->writeFirst = -1;
       brl->data->writeLast = -1;
     }
+
+#ifdef _MSC_VER
+    free(buffer);
+#endif /* _MSC_VER */
 
     return 1;
   }
@@ -958,7 +974,11 @@ updateKeys (BrailleDisplay *brl, uint64_t newKeys, KeyNumber keyBase, unsigned c
   const KeyGroup group = FS_GRP_NavigationKeys;
   KeyNumber number = keyBase;
 
+#ifdef _MSC_VER
+  KeyNumber* pressKeys = (KeyNumber*) malloc(keyCount * sizeof(*pressKeys));
+#else /* _MSC_VER */
   KeyNumber pressKeys[keyCount];
+#endif /* _MSC_VER */
   unsigned int pressCount = 0;
 
   uint64_t keyBit = UINT64_C(0X1) << keyBase;
@@ -982,6 +1002,10 @@ updateKeys (BrailleDisplay *brl, uint64_t newKeys, KeyNumber keyBase, unsigned c
   }
 
   while (pressCount) enqueueKeyEvent(brl, group, pressKeys[--pressCount], 1);
+#ifdef _MSC_VER
+  free(pressKeys);
+#endif /* _MSC_VER */
+
 }
 
 static int

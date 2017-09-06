@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE bc
+#define DRIVER_NAME BrailComm
+#define DRIVER_COMMENT "III"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <errno.h>
@@ -137,8 +145,13 @@ writePacket (BrailleDisplay *brl, const unsigned char *packet, size_t size) {
 }
 
 static int
-writeLine (BrailleDisplay *brl) {
-  unsigned char packet[2 + (brl->textColumns * 2)];
+writeLine (BrailleDisplay *brl) {  
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*) malloc((2 + (brl->textColumns * 2)) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[2 + (brl->textColumns * 2)];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
 
   *byte++ = statusCells[gscScreenCursorRow];
@@ -176,7 +189,13 @@ writeLine (BrailleDisplay *brl) {
     }
   }
 
-  return writePacket(brl, packet, byte-packet);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, packet, byte - packet);
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePacket(brl, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -211,7 +230,7 @@ static int
 readByte (unsigned char *byte, int wait) {
   const int timeout = 100;
   ssize_t result = serialReadData(serialDevice,
-                                  byte, sizeof(*byte),
+                                  byte, sizeof(*byte),  
                                   (wait? timeout: 0), timeout);
 
   if (result > 0) return 1;

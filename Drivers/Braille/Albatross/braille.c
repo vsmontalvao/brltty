@@ -21,6 +21,14 @@
  * Author: Dave Mielke <dave@mielke.cc>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE at
+#define DRIVER_NAME Albatross
+#define DRIVER_COMMENT "46/80"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -397,7 +405,13 @@ clearDisplay (BrailleDisplay *brl) {
 static int
 updateDisplay (BrailleDisplay *brl, const unsigned char *cells, unsigned int count, unsigned int start) {
   static time_t lastUpdate = 0;
+
+  #ifdef _MSC_VER
+  unsigned char* bytes = (unsigned char*) malloc((count * 2 + 2) * sizeof(*bytes));
+  #else /* _MSC_VER */
   unsigned char bytes[count * 2 + 2];
+  #endif /* _MSC_VER */
+
   unsigned char *byte = bytes;
   unsigned int index;
   *byte++ = 0XFB;
@@ -416,9 +430,24 @@ updateDisplay (BrailleDisplay *brl, const unsigned char *cells, unsigned int cou
 
   if (((byte - bytes) > 1) || (time(NULL) != lastUpdate)) {
     *byte++ = 0XFC;
-    if (!writeBytes(brl, bytes, byte-bytes)) return 0;
+
+#ifdef _MSC_VER
+    if (!writeBytes(brl, bytes, byte - bytes))
+    {
+        free(bytes);
+        return 0;
+    }
+#else /* _MSC_VER */
+    if (!writeBytes(brl, bytes, byte - bytes)) return 0;
+#endif /* _MSC_VER */
+
     lastUpdate = time(NULL);
   }
+
+#ifdef _MSC_VER
+  free(bytes);
+#endif /* _MSC_VER */
+
   return 1;
 }
 

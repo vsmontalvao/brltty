@@ -77,6 +77,14 @@
  * Version 1.1 worked on nav40 and was reported to work on pb40.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE ts
+#define DRIVER_NAME TSI
+#define DRIVER_COMMENT "Navigator 20/40/80, PowerBraille 40/65/80"
+#define DRIVER_VERSION "2.74 (April 2004)"
+#define DRIVER_DEVELOPERS "Stéphane Doyon <s.doyon@videotron.ca>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -778,7 +786,12 @@ writeCells (BrailleDisplay *brl, unsigned int from, unsigned int to) {
   };
 
   unsigned int length = to - from;
+#ifdef _MSC_VER
+  unsigned char* packet = (unsigned char*)malloc((sizeof(header) + 2 + (length * 2)) * sizeof(*packet));
+#else /* _MSC_VER */
   unsigned char packet[sizeof(header) + 2 + (length * 2)];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
   unsigned int i;
 
@@ -823,7 +836,13 @@ writeCells (BrailleDisplay *brl, unsigned int from, unsigned int to) {
    * PB40.
    */
 
+#ifdef _MSC_VER
+  int writeResult = writeBytes(brl, packet, (byte - packet));
+  free(packet);
+  return writeResult;
+#else /* _MSC_VER */
   return writeBytes(brl, packet, (byte - packet));
+#endif /* _MSC_VER */
 }
 
 static int 

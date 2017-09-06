@@ -102,6 +102,14 @@
  *                (old) BrailleLite code.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE al
+#define DRIVER_NAME Alva
+#define DRIVER_COMMENT "ABT(3nn), Delphi(4nn), Satellite(5nn), Braille System 40, Braille Controller 640/680, Easy Link 12"
+#define DRIVER_VERSION "2.2"
+#define DRIVER_DEVELOPERS "Nicolas Pitre <nico@fluxnic.net>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -698,8 +706,14 @@ static int
 updateSettings (BrailleDisplay *brl) {
   size_t length = 0;
   const size_t size = 0X20;
+  #ifdef _MSC_VER
+  unsigned char* old = (unsigned char*) malloc(size * sizeof(*old));
+  unsigned char* new = (unsigned char*) malloc(size * sizeof(*new));
+  #else /* _MSC_VER */
   unsigned char old[size];
   unsigned char new[size];
+  #endif /* _MSC_VER */
+
   const SettingsUpdateEntry *settings = protocol->requiredSettings;
 
   if (settings) {
@@ -717,6 +731,10 @@ updateSettings (BrailleDisplay *brl) {
             if (errno == ETIMEDOUT) goto next;
 #endif /* ETIMEDOUT */
 
+#ifdef _MSC_VER
+            free(old);
+            free(new);
+#endif /* _MSC_VER */
             return 0;
           }
 
@@ -737,7 +755,14 @@ updateSettings (BrailleDisplay *brl) {
     }
   }
 
+#ifdef _MSC_VER
+  int result = flushSettingsUpdate(brl, length, old, new);
+  free(old);
+  free(new);
+  return result;
+#else /* _MSC_VER */
   return flushSettingsUpdate(brl, length, old, new);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -1140,7 +1165,11 @@ writeBraille1 (BrailleDisplay *brl, const unsigned char *cells, int start, int c
   static const unsigned char header[] = {CR, ESC, 'B'};	/* escape code to display braille */
   static const unsigned char trailer[] = {CR};		/* to send after the braille sequence */
 
+#ifdef _MSC_VER
+  unsigned char* packet = (unsigned char*) malloc((sizeof(header) + 2 + count + sizeof(trailer)) * sizeof(*packet));
+#else /* _MSC_VER */
   unsigned char packet[sizeof(header) + 2 + count + sizeof(trailer)];
+#endif /* _MSC_VER */
   unsigned char *byte = packet;
 
   byte = mempcpy(byte, header, sizeof(header));
@@ -1149,7 +1178,13 @@ writeBraille1 (BrailleDisplay *brl, const unsigned char *cells, int start, int c
   byte = mempcpy(byte, cells, count);
   byte = mempcpy(byte, trailer, sizeof(trailer));
 
-  return writeBraillePacket(brl, NULL, packet, byte-packet);
+#ifdef _MSC_VER
+  int result = writeBraillePacket(brl, NULL, packet, byte - packet);
+  free(packet);
+  return result;
+#else /* _MSC_VER */
+  return writeBraillePacket(brl, NULL, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static const ProtocolOperations protocol1Operations = {
@@ -1596,7 +1631,11 @@ readCommand2s (BrailleDisplay *brl) {
 
 static int
 writeBraille2s (BrailleDisplay *brl, const unsigned char *cells, int start, int count) {
-  unsigned char packet[4 + count];
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*) malloc((4 + count) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[4 + count];
+#endif /* _MSC_VER */
   unsigned char *byte = packet;
 
   *byte++ = ESC;
@@ -1605,7 +1644,13 @@ writeBraille2s (BrailleDisplay *brl, const unsigned char *cells, int start, int 
   *byte++ = count;
   byte = mempcpy(byte, cells, count);
 
-  return writeBraillePacket(brl, NULL, packet, byte-packet);
+#ifdef _MSC_VER
+  int result = writeBraillePacket(brl, NULL, packet, byte - packet);
+  free(packet);
+  return result;
+#else /* _MSC_VER */
+  return writeBraillePacket(brl, NULL, packet, byte - packet);
+#endif /* _MSC_VER */
 }
 
 static const SettingsUpdateEntry requiredSettings2s[] = {
@@ -1774,7 +1819,11 @@ static int
 writeBraille2u (BrailleDisplay *brl, const unsigned char *cells, int start, int count) {
   while (count > 0) {
     int length = MIN(count, 40);
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*) malloc((3 + length) * sizeof(*packet));
+#else /* _MSC_VER */
     unsigned char packet[3 + length];
+#endif /* _MSC_VER */
     unsigned char *byte = packet;
 
     *byte++ = 0X02;
@@ -1782,7 +1831,15 @@ writeBraille2u (BrailleDisplay *brl, const unsigned char *cells, int start, int 
     *byte++ = length;
     byte = mempcpy(byte, cells, length);
 
-    if (!writeBraillePacket(brl, NULL, packet, byte-packet)) return 0;
+#ifdef _MSC_VER
+    if (!writeBraillePacket(brl, NULL, packet, byte - packet))
+    {
+        free(packet);
+        return 0;
+    }
+#else /* _MSC_VER */
+    if (!writeBraillePacket(brl, NULL, packet, byte - packet)) return 0;
+#endif /* _MSC_VER */
     cells += length;
     start += length;
     count -= length;
@@ -2001,10 +2058,20 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
 
     {
       size_t count = to - from;
+#ifdef _MSC_VER
+      unsigned char* cells = (unsigned char*)malloc(count * sizeof(*cells));
+#else /* _MSC_VER */
       unsigned char cells[count];
+#endif /* _MSC_VER */
 
       translateOutputCells(cells, &brl->buffer[from], count);
-      if (!protocol->writeBraille(brl, cells, textOffset+from, count)) return 0;
+#ifdef _MSC_VER
+      int writeResult = protocol->writeBraille(brl, cells, textOffset + from, count);
+      free(cells);
+      if (!writeResult) return 0;
+#else /* _MSC_VER */
+      if (!protocol->writeBraille(brl, cells, textOffset + from, count)) return 0;
+#endif /* _MSC_VER */
     }
   }
 
@@ -2016,10 +2083,20 @@ brl_writeStatus (BrailleDisplay *brl, const unsigned char *status) {
   size_t cellCount = brl->statusColumns;
 
   if (cellsHaveChanged(previousStatus, status, cellCount, NULL, NULL, &statusRewriteRequired)) {
-    unsigned char cells[cellCount];
+#ifdef _MSC_VER
+      unsigned char* cells = (unsigned char*)malloc(cellCount * sizeof(*cells));
+#else /* _MSC_VER */
+      unsigned char cells[cellCount];
+#endif /* _MSC_VER */
 
     translateOutputCells(cells, status, cellCount);
+#ifdef _MSC_VER
+    int writeResult = protocol->writeBraille(brl, cells, statusOffset, cellCount);
+    free(cells);
+    if (!writeResult) return 0;
+#else /* _MSC_VER */
     if (!protocol->writeBraille(brl, cells, statusOffset, cellCount)) return 0;
+#endif /* _MSC_VER */
   }
 
   return 1;

@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE hm
+#define DRIVER_NAME HIMS
+#define DRIVER_COMMENT "Braille Sense, SyncBraille, Braille Edge, Smart Beetle"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -377,7 +385,12 @@ writePacket (
   const unsigned char *data1, size_t length1,
   const unsigned char *data2, size_t length2
 ) {
-  unsigned char packet[2 + 1 + 1 + 2 + length1 + 1 + 1 + 2 + length2 + 1 + 4 + 1 + 2];
+#ifdef _MSC_VER
+    unsigned char* packet = (unsigned char*) malloc((2 + 1 + 1 + 2 + length1 + 1 + 1 + 2 + length2 + 1 + 4 + 1 + 2) * sizeof(*packet));
+#else /* _MSC_VER */
+    unsigned char packet[2 + 1 + 1 + 2 + length1 + 1 + 1 + 2 + length2 + 1 + 4 + 1 + 2];
+#endif /* _MSC_VER */
+
   unsigned char *byte = packet;
   unsigned char *checksum;
 
@@ -490,10 +503,20 @@ static const ProtocolEntry *protocolTable[] = {
 static int
 writeCells (BrailleDisplay *brl) {
   const size_t count = MIN(brl->textColumns*brl->textRows, MAXIMUM_CELL_COUNT);
+#ifdef _MSC_VER
+  unsigned char* cells = (unsigned char*)malloc(count * sizeof(*cells));
+#else /* _MSC_VER */
   unsigned char cells[count];
+#endif /* _MSC_VER */
 
   translateOutputCells(cells, brl->data->previousCells, count);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, 0XFC, 0X01, cells, count, NULL, 0);
+  free(cells);
+  return writeResult;
+#else /* _MSC_VER */
   return writePacket(brl, 0XFC, 0X01, cells, count, NULL, 0);
+#endif /* _MSC_VER */
 }
 
 static int

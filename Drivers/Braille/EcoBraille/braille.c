@@ -28,6 +28,14 @@
  *              - fix correct size of braille lines.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE ec
+#define DRIVER_NAME EcoBraille
+#define DRIVER_COMMENT "20/40/80"
+#define DRIVER_VERSION "1.00"
+#define DRIVER_DEVELOPERS "Oscar Fernandez <ofa@once.es>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -135,7 +143,11 @@ static char BRL_KEY[] = "\x10\x02\x88";
 static int WriteToBrlDisplay(unsigned char *Data)
 {
   unsigned int size = DIM_BRL_WRITE_PREFIX + BrailleSize + DIM_BRL_WRITE_SUFIX;
+#ifdef _MSC_VER
+  unsigned char* buffer = (unsigned char*)malloc(size * sizeof(*buffer));
+#else /* _MSC_VER */
   unsigned char buffer[size];
+#endif /* _MSC_VER */
   unsigned char *byte = buffer;
   
   byte = mempcpy(byte, BRL_WRITE_PREFIX, DIM_BRL_WRITE_PREFIX);
@@ -143,6 +155,7 @@ static int WriteToBrlDisplay(unsigned char *Data)
   byte = mempcpy(byte, BRL_WRITE_SUFIX, DIM_BRL_WRITE_SUFIX);
  
   serialWriteData(serialDevice, buffer, byte-buffer);
+  free(buffer);
   return 0;
 }
 

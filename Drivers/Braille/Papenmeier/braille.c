@@ -34,6 +34,14 @@
  *   August Hörandl <august.hoerandl@gmx.at>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE pm
+#define DRIVER_NAME Papenmeier
+#define DRIVER_COMMENT "Compact 486, Compact/Tiny, IB 80 CR Soft, 2D Lite (plus), 2D Screen Soft, EL 80, EL 2D 40/66/80, EL 40/66/70/80 S, EL 40/60/80 C, EL 2D 80 S, EL 40 P, EL 80 II, Elba 20/32, Trio 40/Elba20/Elba32, Live 20/40"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "August Hörandl <august.hoerandl@gmx.at>, Heimo Schön <heimo.schoen@gmx.at>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>
@@ -283,7 +291,11 @@ writePacket1 (BrailleDisplay *brl, unsigned int xmtAddress, unsigned int count, 
     static const unsigned char trailer[] = {ETX};
 
     unsigned int size = sizeof(header) + count + sizeof(trailer);
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc(size * sizeof(*buffer));
+#else /* _MSC_VER */
     unsigned char buffer[size];
+#endif /* _MSC_VER */
     unsigned char *byte = buffer;
 
     header[2] = xmtAddress >> 8;
@@ -296,7 +308,13 @@ writePacket1 (BrailleDisplay *brl, unsigned int xmtAddress, unsigned int count, 
     byte = mempcpy(byte, data, count);
     byte = mempcpy(byte, trailer, sizeof(trailer));
 
-    if (!writePacket(brl, buffer, byte-buffer)) return 0;
+#ifdef _MSC_VER
+    int writeResult = writePacket(brl, buffer, byte - buffer);
+    free(buffer);
+    if (!writeResult) return 0;
+#else /* _MSC_VER */
+    if (!writePacket(brl, buffer, byte - buffer)) return 0;
+#endif /* _MSC_VER */
   }
   return 1;
 }
@@ -414,10 +432,21 @@ handleKey1 (BrailleDisplay *brl, uint16_t code, int press, uint16_t time) {
 
 static int
 disableOutputTranslation1 (BrailleDisplay *brl, unsigned char xmtOffset, int count) {
+#ifdef _MSC_VER
+  unsigned char* buffer = (unsigned char*)malloc(count * sizeof(*buffer));
+#else /* _MSC_VER */
   unsigned char buffer[count];
+#endif /* _MSC_VER */
+
   memset(buffer, 1, sizeof(buffer));
-  return writePacket1(brl, PM_P1_XMT_BRLWRITE+xmtOffset,
-                      sizeof(buffer), buffer);
+#ifdef _MSC_VER
+  int writeResult = writePacket1(brl, PM_P1_XMT_BRLWRITE + xmtOffset, sizeof(buffer), buffer);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePacket1(brl, PM_P1_XMT_BRLWRITE + xmtOffset,
+      sizeof(buffer), buffer);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -428,16 +457,32 @@ initializeTable1 (BrailleDisplay *brl) {
 
 static void
 writeText1 (BrailleDisplay *brl, unsigned int start, unsigned int count) {
+#ifdef _MSC_VER
+  unsigned char* buffer = (unsigned char*)malloc(count * sizeof(*buffer));
+#else /* _MSC_VER */
   unsigned char buffer[count];
+#endif /* _MSC_VER */
   translateOutputCells(buffer, brl->data->textCells+start, count);
   writePacket1(brl, PM_P1_XMT_BRLDATA+brl->data->prot.p1.xmt.textOffset+start, count, buffer);
+#ifdef _MSC_VER
+  free(buffer);
+#endif /* _MSC_VER */
 }
 
 static void
 writeStatus1 (BrailleDisplay *brl, unsigned int start, unsigned int count) {
-  unsigned char buffer[count];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc(count * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[count];
+#endif /* _MSC_VER */
+
   translateOutputCells(buffer, brl->data->statusCells+start, count);
   writePacket1(brl, PM_P1_XMT_BRLDATA+brl->data->prot.p1.xmt.statusOffset+start, count, buffer);
+
+#ifdef _MSC_VER
+  free(buffer);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -672,7 +717,12 @@ readPacket2 (BrailleDisplay *brl, void *packet, size_t size) {
 
 static int
 writePacket2 (BrailleDisplay *brl, unsigned char command, unsigned char count, const unsigned char *data) {
-  unsigned char buffer[(count * 2) + 5];
+#ifdef _MSC_VER
+    unsigned char* buffer = (unsigned char*)malloc(((count * 2) + 5) * sizeof(*buffer));
+#else /* _MSC_VER */
+    unsigned char buffer[(count * 2) + 5];
+#endif /* _MSC_VER */
+
   unsigned char *byte = buffer;
 
   *byte++ = STX;
@@ -687,7 +737,13 @@ writePacket2 (BrailleDisplay *brl, unsigned char command, unsigned char count, c
   }
 
   *byte++ = ETX;
-  return writePacket(brl, buffer, byte-buffer);
+#ifdef _MSC_VER
+  int writeResult = writePacket(brl, buffer, byte - buffer);
+  free(buffer);
+  return writeResult;
+#else /* _MSC_VER */
+  return writePacket(brl, buffer, byte - buffer);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -1183,7 +1239,11 @@ brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
 static void
 initializeGenericStatusCodes (BrailleDisplay *brl) {
   const size_t count = ARRAY_COUNT(brl->data->gsc.codes);
+#ifdef _MSC_VER
+  int* commands = (int*)malloc(count * sizeof(*commands));
+#else /* _MSC_VER */
   int commands[count];
+#endif /* _MSC_VER */
 
   getKeyGroupCommands(brl->keyTable, PM_GRP_SK1, commands, count);
 
@@ -1226,12 +1286,19 @@ initializeGenericStatusCodes (BrailleDisplay *brl) {
 #undef SET
     }
   }
+#ifdef _MSC_VER
+  free(commands);
+#endif /* _MSC_VER */
 }
 
 static int
 brl_writeStatus (BrailleDisplay *brl, const unsigned char *s) {
   if (brl->data->model->statusCount) {
-    unsigned char cells[brl->data->model->statusCount];
+#ifdef _MSC_VER
+      unsigned char* cells = (unsigned char*)malloc((brl->data->model->statusCount) * sizeof(*cells));
+#else /* _MSC_VER */
+      unsigned char cells[brl->data->model->statusCount];
+#endif /* _MSC_VER */
 
     if (s[GSC_FIRST] == GSC_MARKER) {
       unsigned int i;
@@ -1291,6 +1358,9 @@ brl_writeStatus (BrailleDisplay *brl, const unsigned char *s) {
     }
 
     updateCells(brl, brl->data->model->statusCount, cells, brl->data->statusCells, brl->data->protocol->writeStatus);
+#ifdef _MSC_VER
+    free(cells);
+#endif /* _MSC_VER */
   }
 
   return 1;

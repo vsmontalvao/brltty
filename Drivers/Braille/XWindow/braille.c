@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE xw
+#define DRIVER_NAME XWindow
+#define DRIVER_COMMENT "X11, Windows"
+#define DRIVER_VERSION "0.1, 2004"
+#define DRIVER_DEVELOPERS "Samuel Thibault <samuel.thibault@ens-lyon.org>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

@@ -740,7 +740,7 @@ releaseFileLock (int file) {
   return modifyFileLock(file, F_ULOCK);
 }
 
-#elif defined(__MINGW32__)
+#elif defined(__MINGW32__) && !defined(_MSC_VER)
 #include <io.h>
 #include <sys/locking.h>
 #include <limits.h>
@@ -809,7 +809,9 @@ releaseFileLock (int file) {
 }
 
 #else /* file locking */
+#ifndef _MSC_VER
 #warning file lock support not available on this platform
+#endif /* _MSC_VER */
 
 int
 acquireFileLock (int file, int exclusive) {
@@ -850,7 +852,11 @@ openFile (const char *path, const char *mode, int optional) {
   FILE *file = fopen(path, mode);
 
   if (file) {
-    logMessage(LOG_DEBUG, "file opened: %s fd=%d", path, fileno(file));
+#ifdef _MSC_VER
+      logMessage(LOG_DEBUG, "file opened: %s fd=%d", path, _fileno(file));
+#else /* _MSC_VER */
+      logMessage(LOG_DEBUG, "file opened: %s fd=%d", path, fileno(file));
+#endif /* _MSC_VER */
   } else {
     logMessage((optional && (errno == ENOENT))? LOG_DEBUG: LOG_ERR,
                "cannot open file: %s: %s", path, strerror(errno));

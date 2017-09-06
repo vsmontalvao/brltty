@@ -1274,8 +1274,11 @@ processDataStream (
 
   {
     struct stat info;
-
+#ifdef _MSC_VER
+    if (fstat(_fileno(stream), &info) != -1) {
+#else /* _MSC_VER */
     if (fstat(fileno(stream), &info) != -1) {
+#endif /* _MSC_VER */
       file.identity.device = info.st_dev;
       file.identity.file = info.st_ino;
     }

@@ -192,6 +192,15 @@ typedef int SocketDescriptor;
 #define closeSocketDescriptor(sd) close(sd)
 #endif /* __MINGW32__ */
 
+#ifdef _MSC_VER
+typedef signed int ssize_t;
+#define strdup _strdup
+#define open _open
+//#define close _close
+#define lseek _lseek
+#define __alignof__ __alignof
+#endif /* _MSC_VER */
+
 #ifdef WINDOWS
 #define getSystemError() GetLastError()
 

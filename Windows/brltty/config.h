@@ -263,10 +263,10 @@
 //
 ///* Define this if standard error is to be redirected to a file. */
 ///* #undef STDERR_PATH */
-//
-///* Define this to be a string containing the path to the locale directory. */
-//#define LOCALE_DIRECTORY "/usr/share/locale"
-//
+
+/* Define this to be a string containing the path to the locale directory. */
+#define LOCALE_DIRECTORY "/usr/share/locale"
+
 ///* Define this to be a string containing the path to a writable directory. */
 //#define WRITABLE_DIRECTORY "/var/run/brltty"
 
@@ -306,8 +306,8 @@
 /* Define this to be a string containing the default parameters for the braille driver(s). */
 #define BRAILLE_PARAMETERS ""
 
-///* Define this to be a string containing the path to the directory containing the devices. */
-//#define DEVICE_DIRECTORY "//."
+/* Define this to be a string containing the path to the directory containing the devices. */
+#define DEVICE_DIRECTORY "//."
 
 /* Define this to be a string containing the path to the default braille device. */
 #define BRAILLE_DEVICE "serial:COM1"
@@ -460,16 +460,16 @@
 //
 ///* Define this if the function addmntent exists. */
 ///* #undef HAVE_ADDMNTENT */
-//
-///* Define this to be a string containing the path to the default text table. */
-//#define TEXT_TABLE "en-nabcc"
-//
-///* Define this to be a string containing the path to the default attributes table. */
-//#define ATTRIBUTES_TABLE "left_right"
-//
-///* Define this to be a string containing a list of the speech driver codes. */
-//#define SPEECH_DRIVER_CODES "al bl cb fv gs xs"
-//
+
+/* Define this to be a string containing the path to the default text table. */
+#define TEXT_TABLE "en-nabcc"
+
+/* Define this to be a string containing the path to the default attributes table. */
+#define ATTRIBUTES_TABLE "left_right"
+
+/* Define this to be a string containing a list of the speech driver codes. */
+#define SPEECH_DRIVER_CODES "al bl cb fv gs xs"
+
 ///* Define this to be a string containing the default parameters for the speech driver(s). */
 //#define SPEECH_PARAMETERS ""
 
@@ -544,51 +544,51 @@
 //
 ///* Define this if the header file sdkddkver.h exists. */
 //#define HAVE_SDKDDKVER_H 1
-//
-///* Define this to be a string containing the subdirectory for text tables. */
-//#define TEXT_TABLES_SUBDIRECTORY "Text"
-//
-///* Define this to be a string containing the subdirectory for attributes tables. */
-//#define ATTRIBUTES_TABLES_SUBDIRECTORY "Attributes"
-//
-///* Define this to be a string containing the subdirectory for contraction tables. */
-//#define CONTRACTION_TABLES_SUBDIRECTORY "Contraction"
-//
-///* Define this to be a string containing the subdirectory for keyboard tables. */
-//#define KEYBOARD_TABLES_SUBDIRECTORY "Keyboard"
-//
-///* Define this to be a string containing the subdirectory for input tables. */
-//#define INPUT_TABLES_SUBDIRECTORY "Input"
-//
-///* Define this to be a string containing the extension for text tables. */
-//#define TEXT_TABLE_EXTENSION ".ttb"
-//
+
+/* Define this to be a string containing the subdirectory for text tables. */
+#define TEXT_TABLES_SUBDIRECTORY "Text"
+
+/* Define this to be a string containing the subdirectory for attributes tables. */
+#define ATTRIBUTES_TABLES_SUBDIRECTORY "Attributes"
+
+/* Define this to be a string containing the subdirectory for contraction tables. */
+#define CONTRACTION_TABLES_SUBDIRECTORY "Contraction"
+
+/* Define this to be a string containing the subdirectory for keyboard tables. */
+#define KEYBOARD_TABLES_SUBDIRECTORY "Keyboard"
+
+/* Define this to be a string containing the subdirectory for input tables. */
+#define INPUT_TABLES_SUBDIRECTORY "Input"
+
+/* Define this to be a string containing the extension for text tables. */
+#define TEXT_TABLE_EXTENSION ".ttb"
+
 ///* Define this to be a string containing the extension for text subtables. */
 //#define TEXT_SUBTABLE_EXTENSION ".tti"
-//
-///* Define this to be a string containing the extension for attributes tables. */
-//#define ATTRIBUTES_TABLE_EXTENSION ".atb"
-//
-///* Define this to be a string containing the extension for attributes subtables. */
-//#define ATTRIBUTES_SUBTABLE_EXTENSION ".ati"
-//
-///* Define this to be a string containing the extension for contraction tables. */
-//#define CONTRACTION_TABLE_EXTENSION ".ctb"
-//
-///* Define this to be a string containing the extension for contraction subtables. */
-//#define CONTRACTION_SUBTABLE_EXTENSION ".cti"
-//
-///* Define this to be a string containing the extension for key tables. */
-//#define KEY_TABLE_EXTENSION ".ktb"
-//
-///* Define this to be a string containing the extension for key subtables. */
-//#define KEY_SUBTABLE_EXTENSION ".kti"
-//
-///* Define this to be a string containing the extension for key help files. */
-//#define KEY_HELP_EXTENSION ".txt"
-//
-///* Define this to be a string containing the subdirectory for profiles. */
-//#define PROFILES_SUBDIRECTORY "Profiles"
+
+/* Define this to be a string containing the extension for attributes tables. */
+#define ATTRIBUTES_TABLE_EXTENSION ".atb"
+
+/* Define this to be a string containing the extension for attributes subtables. */
+#define ATTRIBUTES_SUBTABLE_EXTENSION ".ati"
+
+/* Define this to be a string containing the extension for contraction tables. */
+#define CONTRACTION_TABLE_EXTENSION ".ctb"
+
+/* Define this to be a string containing the extension for contraction subtables. */
+#define CONTRACTION_SUBTABLE_EXTENSION ".cti"
+
+/* Define this to be a string containing the extension for key tables. */
+#define KEY_TABLE_EXTENSION ".ktb"
+
+/* Define this to be a string containing the extension for key subtables. */
+#define KEY_SUBTABLE_EXTENSION ".kti"
+
+/* Define this to be a string containing the extension for key help files. */
+#define KEY_HELP_EXTENSION ".txt"
+
+/* Define this to be a string containing the subdirectory for profiles. */
+#define PROFILES_SUBDIRECTORY "Profiles"
 
 /* Define this to be a string containing the extension for language profiles. */
 #define LANGUAGE_PROFILE_EXTENSION ".lpf"

@@ -21,6 +21,14 @@
  * Maintained by Nikhil Nair <nn201@cus.cam.ac.uk>
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE bl
+#define DRIVER_NAME BrailleLite
+#define DRIVER_COMMENT ""
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS ""
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <stdio.h>

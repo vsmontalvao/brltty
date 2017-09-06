@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE mm
+#define DRIVER_NAME BrailleMemo
+#define DRIVER_COMMENT "Pocket (16), Smart (16), 32, 40"
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS "Dave Mielke <dave@mielke.cc>"
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include <string.h>
@@ -174,7 +182,11 @@ writePacket (
   unsigned char code, unsigned char subcode,
   const unsigned char *data, size_t length
 ) {
-  unsigned char bytes[sizeof(MM_CommandHeader) + length];
+#ifdef _MSC_VER
+    unsigned char* bytes = (unsigned char*)malloc((sizeof(MM_CommandHeader) + length) * sizeof(*bytes));
+#else /* _MSC_VER */
+    unsigned char bytes[sizeof(MM_CommandHeader) + length];
+#endif /* _MSC_VER */
   unsigned char *byte = bytes;
 
   *byte++ = MM_HEADER_ID1;
@@ -188,7 +200,13 @@ writePacket (
 
   if (data) byte = mempcpy(byte, data, length);
 
-  return writeBytes(brl, bytes, byte-bytes);
+#ifdef _MSC_VER
+  int writeResult = writeBytes(brl, bytes, byte - bytes);
+  free(bytes);
+  return writeResult;
+#else /* _MSC_VER */
+  return writeBytes(brl, bytes, byte - bytes);
+#endif /* _MSC_VER */
 }
 
 static BraillePacketVerifierResult
@@ -451,10 +469,20 @@ brl_destruct (BrailleDisplay *brl) {
 static int
 brl_writeWindow (BrailleDisplay *brl, const wchar_t *text) {
   if (cellsHaveChanged(brl->data->textCells, brl->buffer, brl->textColumns, NULL, NULL, &brl->data->forceRewrite)) {
-    unsigned char cells[brl->textColumns];
+#ifdef _MSC_VER
+      unsigned char* cells = (unsigned char*) malloc((brl->textColumns) * sizeof(*cells));
+#else /* _MSC_VER */
+      unsigned char cells[brl->textColumns];
+#endif /* _MSC_VER */
 
     translateOutputCells(cells, brl->data->textCells, brl->textColumns);
+#ifdef _MSC_VER
+    int sendResult = sendBrailleData(brl, cells, sizeof(cells));
+    free(cells);
+    if (!sendResult) return 0;
+#else /* _MSC_VER */
     if (!sendBrailleData(brl, cells, sizeof(cells))) return 0;
+#endif /* _MSC_VER */
   }
 
   return 1;
