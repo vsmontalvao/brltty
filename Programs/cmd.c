@@ -204,7 +204,12 @@ STR_BEGIN_FORMATTER(describeCommand, int command, CommandDescriptionOption optio
     if (cmd->isToggle && (command & BRL_FLG_TOGGLE_MASK)) {
       const char *text = gettext(cmd->description);
       size_t length = strlen(text);
+#ifdef _MSC_VER
+      char* buffer = (char*)malloc((length + 1) * sizeof(*buffer));
+#else /* _MSC_VER */
       char buffer[length + 1];
+#endif /* _MSC_VER */
+
       char *delimiter;
 
       strcpy(buffer, text);
@@ -236,6 +241,9 @@ STR_BEGIN_FORMATTER(describeCommand, int command, CommandDescriptionOption optio
 
     toggleReady:
       STR_PRINTF("%s", buffer);
+#ifdef _MSC_VER
+      free(buffer);
+#endif /* _MSC_VER */
     } else {
       STR_PRINTF("%s", gettext(cmd->description));
     }

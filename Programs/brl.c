@@ -169,7 +169,11 @@ setStatusText (BrailleDisplay *brl, const char *text) {
   unsigned int length = brl->statusColumns * brl->statusRows;
 
   if (braille->writeStatus && (length > 0)) {
-    unsigned char cells[length];
+#ifdef _MSC_VER
+      unsigned char* cells = (unsigned char*)malloc(length * sizeof(*cells));
+#else /* _MSC_VER */
+      unsigned char cells[length];
+#endif /* _MSC_VER */
 
     {
       unsigned int index = 0;
@@ -186,7 +190,13 @@ setStatusText (BrailleDisplay *brl, const char *text) {
       memset(&cells[index], 0, length-index);
     }
 
+#ifdef _MSC_VER
+    int writeResult = braille->writeStatus(brl, cells);
+    free(cells);
+    if (!writeResult) return 0;
+#else /* _MSC_VER */
     if (!braille->writeStatus(brl, cells)) return 0;
+#endif /* _MSC_VER */
   }
 
   return 1;

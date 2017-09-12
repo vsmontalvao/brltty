@@ -347,7 +347,7 @@ serialGetData (
     return -1;
   }
 
-  while (size && ReadFile(serial->package.fileHandle, buffer + length, size, &bytesRead, NULL)) {
+  while (size && ReadFile(serial->package.fileHandle, (unsigned char *)buffer + length, size, &bytesRead, NULL)) {
     if (!bytesRead) return length;
     size -= bytesRead;
     length += bytesRead;
@@ -377,7 +377,7 @@ serialPutData (
   while (left && WriteFile(serial->package.fileHandle, data, left, &bytesWritten, NULL)) {
     if (!bytesWritten) break;
     left -= bytesWritten;
-    data += bytesWritten;
+    (unsigned char *) data += bytesWritten;
   }
 
   if (!left) return size;

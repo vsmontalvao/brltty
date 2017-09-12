@@ -101,7 +101,11 @@ getDeviceDirectory (void) {
 
       if (root && *root) {
         const size_t rootLength = strlen(root);
+#ifdef _MSC_VER
+        char* path = (char*)malloc((rootLength + directoryLength + 1) * sizeof(*path));
+#else /* _MSC_VER */
         char path[rootLength + directoryLength + 1];
+#endif /* _MSC_VER */
         snprintf(path, sizeof(path), "%s%s", root, directory);
 
         if (testDirectoryPath(path)) {
@@ -111,6 +115,9 @@ getDeviceDirectory (void) {
           logMessage(LOG_ERR, "device directory error: %s (%s): %s",
                      path, *variable, strerror(errno));
         }
+#ifdef _MSC_VER
+        free(path);
+#endif /* _MSC_VER */
       }
 
       variable += 1;
@@ -177,7 +184,12 @@ resolveDeviceName (const char *const *names, const char *description) {
 
 char **
 getDeviceParameters (const char *const *names, const char *identifier) {
-  char parameters[strlen(names[0]) + 1 + strlen(identifier) + 1];
+#ifdef _MSC_VER
+    char* parameters = (char*)malloc((strlen(names[0]) + 1 + strlen(identifier) + 1) * sizeof(*parameters));
+#else /* _MSC_VER */
+    char parameters[strlen(names[0]) + 1 + strlen(identifier) + 1];
+#endif /* _MSC_VER */
+
   STR_BEGIN(parameters, sizeof(parameters))
 
   {
@@ -204,7 +216,13 @@ getDeviceParameters (const char *const *names, const char *identifier) {
   }
 
   STR_END;
+#ifdef _MSC_VER
+  char** parameterValues = getParameters(names, NULL, parameters);
+  free(parameters);
+  return parameterValues;
+#else /* _MSC_VER */
   return getParameters(names, NULL, parameters);
+#endif /* _MSC_VER */
 }
 
 #ifdef ALLOW_DOS_DEVICE_NAMES

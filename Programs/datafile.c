@@ -157,7 +157,11 @@ isOctalDigit (wchar_t character, int *value, int *shift) {
 int
 isNumber (int *number, const wchar_t *characters, int length) {
   if (length > 0) {
-    char string[length + 1];
+#ifdef _MSC_VER
+      char* string = (char*)malloc((length + 1) * sizeof(*string));
+#else /* _MSC_VER */
+      char string[length + 1];
+#endif /* _MSC_VER */
     string[length] = 0;
 
     {
@@ -179,6 +183,9 @@ isNumber (int *number, const wchar_t *characters, int length) {
         return 1;
       }
     }
+#ifdef _MSC_VER
+    free(string);
+#endif /* _MSC_VER */
   }
 
   return 0;
@@ -448,7 +455,12 @@ parseDataString (DataFile *file, DataString *string, const wchar_t *characters, 
               index += count;
 
               {
-                char name[count+1];
+#ifdef _MSC_VER
+                  char* name = (char*)malloc((count + 1) * sizeof(*name));
+#else /* _MSC_VER */
+                  char name[count + 1];
+#endif /* _MSC_VER */
+
 
                 {
                   unsigned int i;
@@ -466,6 +478,10 @@ parseDataString (DataFile *file, DataString *string, const wchar_t *characters, 
                 }
 
                 if (getCharacterByName(&character, name)) ok = 1;
+#ifdef _MSC_VER
+                free(name);
+#endif /* _MSC_VER */
+
               }
             } else {
               index = length - 1;
@@ -926,7 +942,11 @@ processDirectiveOperand (DataFile *file, DataDirectives *directives, const char 
     if (!prepareDataDirectives(directives)) return 0;
 
     {
+#ifdef _MSC_VER
+      wchar_t* string = (wchar_t*)malloc((name.length + 1) * sizeof(*string));
+#else /* _MSC_VER */
       wchar_t string[name.length + 1];
+#endif /* _MSC_VER */
 
       wmemcpy(string, name.characters, name.length);
       string[name.length] = 0;
@@ -935,6 +955,10 @@ processDirectiveOperand (DataFile *file, DataDirectives *directives, const char 
         directive = directives->unnamed;
         ungetDataCharacters(file, name.length);
       }
+#ifdef _MSC_VER
+      free(string);
+#endif /* _MSC_VER */
+
     }
 
     if (!(directive->unconditional || testDataCondition(file))) return 1;
@@ -1205,7 +1229,12 @@ includeDataFile (DataFile *file, const wchar_t *name, int length) {
     }
 
     {
-      char path[prefixLength + suffixLength + 1];
+#ifdef _MSC_VER
+        char* path = (char*)malloc((prefixLength + suffixLength + 1) * sizeof(*path));
+#else /* _MSC_VER */
+        char path[prefixLength + suffixLength + 1];
+#endif /* _MSC_VER */
+
       FILE *stream;
 
       snprintf(path, sizeof(path), "%.*s%.*s",
@@ -1216,6 +1245,9 @@ includeDataFile (DataFile *file, const wchar_t *name, int length) {
         if (processDataStream(file, stream, path, file->parameters)) ok = 1;
         fclose(stream);
       }
+#ifdef _MSC_VER
+      free(path);
+#endif /* _MSC_VER */
     }
 
     free(suffixAddress);
@@ -1241,7 +1273,11 @@ processDataLine (char *line, void *dataAddress) {
   DataFile *file = dataAddress;
   size_t size = strlen(line) + 1;
   const char *byte = line;
+#ifdef _MSC_VER
+  wchar_t* characters = (wchar_t*)malloc(size * sizeof(*characters));
+#else /* _MSC_VER */
   wchar_t characters[size];
+#endif /* _MSC_VER */
   wchar_t *character = characters;
 
   file->line += 1;
@@ -1253,7 +1289,14 @@ processDataLine (char *line, void *dataAddress) {
     return 1;
   }
 
+#ifdef _MSC_VER
+  int processResult = processDataCharacters(file, characters);
+  free(characters);
+  return processResult;
+#else /* _MSC_VER */
   return processDataCharacters(file, characters);
+#endif /* _MSC_VER */
+
 }
 
 int

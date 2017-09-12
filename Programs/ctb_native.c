@@ -874,7 +874,12 @@ contractText_native (BrailleContractionData *bcd) {
   BYTE *destlast = NULL;
   const wchar_t *literal = NULL;
 
+#ifdef _MSC_VER
+  unsigned char* lineBreakOpportunities = (unsigned char*)malloc(getInputCount(bcd) * sizeof(*lineBreakOpportunities));
+#else /* _MSC_VER */
   unsigned char lineBreakOpportunities[getInputCount(bcd)];
+#endif /* _MSC_VER */
+
   LineBreakOpportunitiesState lbo;
 
   prepareLineBreakOpportunitiesState(&lbo);
@@ -1070,6 +1075,10 @@ done:
       bcd->output.current = destlast;
     }
   }
+
+#ifdef _MSC_VER
+  free(lineBreakOpportunities);
+#endif /* _MSC_VER */
 
   return 1;
 }

@@ -114,14 +114,30 @@ readScreen (short left, short top, short width, short height, ScreenCharacter *b
 int
 readScreenText (short left, short top, short width, short height, wchar_t *buffer) {
   unsigned int count = width * height;
+#ifdef _MSC_VER
+  ScreenCharacter* characters = (ScreenCharacter*)malloc(count * sizeof(*characters));
+#else /* _MSC_VER */
   ScreenCharacter characters[count];
+#endif /* _MSC_VER */
+#ifdef _MSC_VER
+  int readResult = readScreen(left, top, width, height, characters);
+  if (!readResult)
+  {
+      free(characters);
+      return 0;
+  }
+#else /* _MSC_VER */
   if (!readScreen(left, top, width, height, characters)) return 0;
+#endif /* _MSC_VER */
 
   {
     int i;
     for (i=0; i<count; ++i) buffer[i] = characters[i].text;
   }
 
+#ifdef _MSC_VER
+  free(characters);
+#endif /* _MSC_VER */
   return 1;
 }
 

@@ -28,7 +28,11 @@ char *
 joinStrings (const char *const *strings, int count) {
   char *string;
   size_t length = 0;
+#ifdef _MSC_VER
+  size_t* lengths = (size_t*)malloc(count * sizeof(*lengths));
+#else /* _MSC_VER */
   size_t lengths[count];
+#endif /* _MSC_VER */
   int index;
 
   for (index=0; index<count; index+=1) {
@@ -47,6 +51,9 @@ joinStrings (const char *const *strings, int count) {
     *target = 0;
   }
 
+#ifdef _MSC_VER
+  free(lengths);
+#endif /* _MSC_VER */
   return string;
 }
 
@@ -71,7 +78,11 @@ extendStringSetting (char **setting, const char *value, int prepend) {
   if (value && *value) {
     if (*setting) {
       size_t newSize = strlen(*setting) + 1 + strlen(value) + 1;
+#ifdef _MSC_VER
+      char* newSetting = (char*)malloc(newSize * sizeof(*newSetting));
+#else /* _MSC_VER */
       char newSetting[newSize];
+#endif /* _MSC_VER */
 
       if (prepend) {
         snprintf(newSetting, newSize, "%s%c%s", value, PARAMETER_SEPARATOR_CHARACTER, *setting);
@@ -79,7 +90,13 @@ extendStringSetting (char **setting, const char *value, int prepend) {
         snprintf(newSetting, newSize, "%s%c%s", *setting, PARAMETER_SEPARATOR_CHARACTER, value);
       }
 
+#ifdef _MSC_VER
+      int changeResult = changeStringSetting(setting, newSetting);
+      free(newSetting);
+      if (!changeResult) return 0;
+#else /* _MSC_VER */
       if (!changeStringSetting(setting, newSetting)) return 0;
+#endif /* _MSC_VER */
     } else if (!changeStringSetting(setting, value)) {
       return 0;
     }

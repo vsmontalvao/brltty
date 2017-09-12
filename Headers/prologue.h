@@ -196,8 +196,9 @@ typedef int SocketDescriptor;
 typedef signed int ssize_t;
 #define strdup _strdup
 #define open _open
-//#define close _close
 #define lseek _lseek
+//#define write _write
+//#define close _close
 #define __alignof__ __alignof
 #endif /* _MSC_VER */
 

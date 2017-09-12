@@ -145,8 +145,8 @@ error:
 
 void
 initializeSystemObject (void) {
-  HMODULE library;
-
+#ifndef _MSC_VER
+    HMODULE library;
 #define LOAD_LIBRARY(name) (library = loadLibrary(name))
 #define GET_PROC(name) (name##Proc = getProcedure(library, #name))
 
@@ -170,6 +170,7 @@ initializeSystemObject (void) {
     GET_PROC(freeaddrinfo);
   }
 #endif /* __MINGW32__ */
+#endif /* _MSC_VER */
 }
 
 #ifdef __MINGW32__
@@ -221,10 +222,17 @@ initializeSystemObject (void) {
 
 char *
 getWindowsLocaleName (void) {
-  if (GetLocaleInfoExProc) {
+#ifdef _MSC_VER
 #define WIN_LOCALE_SIZE 85
     WCHAR buffer[WIN_LOCALE_SIZE];
-    int result = GetLocaleInfoExProc(LOCALE_NAME_USER_DEFAULT, LOCALE_SNAME, buffer, WIN_LOCALE_SIZE);
+    int result = GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_SNAME, buffer, WIN_LOCALE_SIZE);
+#else /* _MSC_VER */
+    if (GetLocaleInfoExProc) {
+        #define WIN_LOCALE_SIZE 85
+        WCHAR buffer[WIN_LOCALE_SIZE];
+        int result = GetLocaleInfoExProc(LOCALE_NAME_USER_DEFAULT, LOCALE_SNAME, buffer, WIN_LOCALE_SIZE);
+#endif /* _MSC_VER */
+
 
     if (result > 0) {
       char locale[WIN_LOCALE_SIZE];
@@ -250,7 +258,9 @@ getWindowsLocaleName (void) {
     } else {
       logWindowsSystemError("GetLocaleInfoEx");
     }
-  }
+    #ifndef _MSC_VER
+    }
+    #endif /* _MSC_VER */
 
   {
     DWORD langid;
@@ -347,7 +357,9 @@ getWindowsLocaleName (void) {
         DIALECT(GREEK, GREECE, "el_GR");
         DIALECT(GREENLANDIC, GREENLAND, "kl_GL");
         DIALECT(GUJARATI, INDIA, "gu_IN");
+#ifndef _MSC_VER
         DIALECT(HAUSA, NIGERIA, "ha_NG");
+#endif /* _MSC_VER */
         DIALECT(HEBREW, ISRAEL, "he_IL");
         DIALECT(HINDI, INDIA, "hi_IN");
         DIALECT(HUNGARIAN, HUNGARY, "hu_HU");
@@ -367,7 +379,9 @@ getWindowsLocaleName (void) {
         DIALECT(KONKANI, INDIA, "kok_IN");
         DIALECT(KOREAN, KOREA, "ko_KR");
         DIALECT(KYRGYZ, KYRGYZSTAN, "ky_KG");
+#ifndef _MSC_VER
         DIALECT(LAO, LAO_PDR, "lo_LA");
+#endif /* _MSC_VER */
         DIALECT(LATVIAN, LATVIA, "lv_LV");
         DIALECT(LITHUANIAN, LITHUANIA, "lt_LT");
         DIALECT(LOWER_SORBIAN, GERMANY, "dsb_DE");
@@ -446,13 +460,17 @@ getWindowsLocaleName (void) {
         DIALECT(SPANISH, VENEZUELA, "es_VE");
         DIALECT(SWEDISH, FINLAND, "sv_FI");
         DIALECT(SWEDISH, SWEDEN, "sv_SE");
+#ifndef _MSC_VER
         DIALECT(SYRIAC, TURKEY, "syr_TR");
+#endif /* _MSC_VER */
         DIALECT(TAMAZIGHT, ALGERIA_LATIN, "ber_DZ@latin");
         DIALECT(TAMIL, INDIA, "ta_IN");
         DIALECT(TATAR, RUSSIA, "tt_RU");
         DIALECT(TELUGU, INDIA, "te_IN");
         DIALECT(THAI, THAILAND, "th_TH");
+#ifndef _MSC_VER
         DIALECT(TIBETAN, BHUTAN, "bo_BT");
+#endif /* _MSC_VER */
         DIALECT(TIBETAN, PRC, "bo_CN");
         DIALECT(TIGRIGNA, ERITREA, "ti_ER");
         DIALECT(TSWANA, SOUTH_AFRICA, "tn_ZA");
@@ -472,7 +490,7 @@ getWindowsLocaleName (void) {
         DIALECT(YI, PRC, "ii_CN");
         DIALECT(YORUBA, NIGERIA, "yo_NG");
         DIALECT(ZULU, SOUTH_AFRICA, "zu_ZA");
-#undef DIALECTo
+#undef DIALECT
 
         default:
           switch (PRIMARYLANGID(langid)) {
@@ -541,7 +559,7 @@ getWindowsLocaleName (void) {
             LANGUAGE(LOWER_SORBIAN, "dsb");
             LANGUAGE(LUXEMBOURGISH, "lb");
             LANGUAGE(MACEDONIAN, "mk");
-#ifndef __MINGW64_VERSION_MAJOR
+#if !defined(__MINGW64_VERSION_MAJOR) && !defined(_MSC_VER)
             LANGUAGE(MALAGASY, "mg");
 #endif
             LANGUAGE(MALAY, "ms");
@@ -604,9 +622,13 @@ getWindowsLocaleName (void) {
 
             default:
               name = NULL;
+#ifndef _MSC_VER
               break;
+#endif /* _MSC_VER */
           }
+#ifndef _MSC_VER
           break;
+#endif /* _MSC_VER */
       }
 
       if (name) {

@@ -32,6 +32,10 @@
 
 #include "timing.h"
 
+#ifdef _MSC_VER
+#include "time.h"
+#endif /* _MSC_VER */
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -271,7 +275,7 @@ typedef struct {
 } pthread_cond_t;
 #define PTHREAD_COND_INITIALIZER { NULL, 0}
 
-#if !defined(__struct_timespec_defined) && !defined(__MINGW64_VERSION_MAJOR)
+#if !defined(__struct_timespec_defined) && !defined(__MINGW64_VERSION_MAJOR) && !defined(_MSC_VER)
 struct timespec {
   time_t  tv_sec;  /* Seconds */
   long    tv_nsec; /* Nanoseconds */

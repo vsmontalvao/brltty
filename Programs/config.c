@@ -942,11 +942,22 @@ static int
 handleUtf8HelpLine (char *line, void *data) {
   const char *utf8 = line;
   size_t count = strlen(utf8) + 1;
+#ifdef _MSC_VER
+  wchar_t* buffer = (wchar_t*)malloc(count * sizeof(*buffer));
+#else /* _MSC_VER */
   wchar_t buffer[count];
+#endif /* _MSC_VER */
+
   wchar_t *characters = buffer;
 
   convertUtf8ToWchars(&utf8, &characters, count);
+#ifdef _MSC_VER
+  int handleResult = handleWcharHelpLine(buffer, data);
+  free(buffer);
+  return handleResult;
+#else /* _MSC_VER */
   return handleWcharHelpLine(buffer, data);
+#endif /* _MSC_VER */
 }
 
 static int

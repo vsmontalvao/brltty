@@ -97,7 +97,10 @@ getCurrentTime (TimeValue *now) {
   now->seconds = time(NULL);
 
 #else /* get current time */
+
+#ifndef _MSC_VER
 #warning get current time not supported on this platform
+#endif /* _MSC_VER */
 #endif /* get current time */
 }
 

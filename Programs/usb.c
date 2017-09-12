@@ -134,7 +134,11 @@ usbGetLanguage (
 char *
 usbDecodeString (const UsbStringDescriptor *descriptor) {
   size_t count = (descriptor->bLength - 2) / sizeof(descriptor->wData[0]);
+#ifdef _MSC_VER
+  char* buffer = (char*)malloc(((count * UTF8_LEN_MAX) + 1) * sizeof(*buffer));
+#else /* _MSC_VER */
   char buffer[(count * UTF8_LEN_MAX) + 1];
+#endif /* _MSC_VER */
 
   const uint16_t *source = descriptor->wData;
   const uint16_t *end = source + count;
@@ -151,6 +155,9 @@ usbDecodeString (const UsbStringDescriptor *descriptor) {
     char *string = strdup(buffer);
 
     if (!string) logMallocError();
+#ifdef _MSC_VER
+    free(buffer);
+#endif /* _MSC_VER */
     return string;
   }
 }

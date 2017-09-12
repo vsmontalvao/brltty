@@ -1538,7 +1538,7 @@ static FileDescriptor createTcpSocket(struct socketInfo *info)
 {
   SocketDescriptor fd = INVALID_SOCKET_DESCRIPTOR;
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(_MSC_VER)
   if (getaddrinfoProc) {
 #endif /* __MINGW32__ */
 
@@ -1586,7 +1586,7 @@ static FileDescriptor createTcpSocket(struct socketInfo *info)
   freeaddrinfo(res);
 #endif /* HAVE_GETADDRINFO */
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(_MSC_VER)
   } else {
 #endif /* __MINGW32__ */
 
@@ -1679,7 +1679,7 @@ static FileDescriptor createTcpSocket(struct socketInfo *info)
                     (struct sockaddr *)&addr, sizeof(addr));
 #endif /* !HAVE_GETADDRINFO */
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(_MSC_VER)
   }
 #endif /* __MINGW32__ */
 
@@ -1777,7 +1777,12 @@ static FileDescriptor createLocalSocket(struct socketInfo *info)
   int lpath=strlen(BRLAPI_SOCKETPATH),lport=strlen(info->port);
   FileDescriptor fd;
 #ifdef __MINGW32__
-  char path[lpath+lport+1];
+#ifdef _MSC_VER
+  char* path = (char*)malloc((lpath + lport + 1) * sizeof(*path));
+#else /* _MSC_VER */
+  char path[lpath + lport + 1];
+#endif /* _MSC_VER */
+
   memcpy(path,BRLAPI_SOCKETPATH,lpath);
   memcpy(path+lpath,info->port,lport+1);
   if ((fd = CreateNamedPipe(path,
@@ -1973,6 +1978,10 @@ outlockfd:
 outfd:
   closeFileDescriptor(fd);
 out:
+#ifdef _MSC_VER
+  free(path);
+#endif /* _MSC_VER */
+
   return INVALID_FILE_DESCRIPTOR;
 }
 #endif /* PF_LOCAL */
@@ -2943,7 +2952,13 @@ int api_flush(BrailleDisplay *brl) {
     }
 
     if (c != displayed_last || c->brlbufstate==TODISPLAY || update) {
-      unsigned char *oldbuf = disp->buffer, buf[displaySize];
+        unsigned char *oldbuf = disp->buffer;
+#ifdef _MSC_VER
+        unsigned char* buf = (unsigned char*)malloc(displaySize * sizeof(*buf));
+#else /* _MSC_VER */
+        unsigned char buf[displaySize];
+#endif /* _MSC_VER */
+
       disp->buffer = buf;
       getDots(&c->brailleWindow, buf);
       brl->cursor = c->brailleWindow.cursor-1;
@@ -2951,6 +2966,9 @@ int api_flush(BrailleDisplay *brl) {
       drain = 1;
       disp->buffer = oldbuf;
       displayed_last = c;
+#ifdef _MSC_VER
+      free(buf);
+#endif /* _MSC_VER */
     }
     unlockMutex(&apiDriverMutex);
     unlockMutex(&c->brailleWindowMutex);

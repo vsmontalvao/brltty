@@ -270,7 +270,12 @@ static void
 addCommandArguments (KeyTable *table, int *command, const CommandEntry *entry, const KeyBinding *binding) {
   if (entry->isOffset | entry->isColumn | entry->isRow | entry->isRange | entry->isKeyboard) {
     unsigned int keyCount = table->pressedKeys.count;
+#ifdef _MSC_VER
+    KeyValue* keyValues = (KeyValue*)malloc(keyCount * sizeof(*keyValues));
+#else /* _MSC_VER */
     KeyValue keyValues[keyCount];
+#endif /* _MSC_VER */
+
     copyKeyValues(keyValues, table->pressedKeys.table, keyCount);
 
     {
@@ -295,6 +300,10 @@ addCommandArguments (KeyTable *table, int *command, const CommandEntry *entry, c
     } else if (entry->isColumn) {
       if (!entry->isRouting) *command |= BRL_MSK_ARG;
     }
+#ifdef _MSC_VER
+    free(keyValues);
+#endif /* _MSC_VER */
+
   }
 }
 

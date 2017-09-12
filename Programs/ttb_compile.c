@@ -302,7 +302,7 @@ finishTextTableData (TextTableData *ttd) {
 
     if (!saveDataItem(ttd->area, &offset, ttd->alias.array,
                       ARRAY_SIZE(ttd->alias.array, ttd->alias.count),
-                      __alignof__(*ttd->alias.array))) {
+                      alignof(*ttd->alias.array))) {
       return 0;
     }
 
@@ -405,7 +405,11 @@ selectTextTable (const char *directory) {
   char *locale = getLocaleName();
 
   if (locale) {
-    char name[strlen(locale) + 1];
+#ifdef _MSC_VER
+      char* name = (char*)malloc((strlen(locale) + 1) * sizeof(*name));
+#else /* _MSC_VER */
+      char name[strlen(locale) + 1];
+#endif /* _MSC_VER */
 
     {
       size_t length = strcspn(locale, ".@");
@@ -430,9 +434,18 @@ selectTextTable (const char *directory) {
     if (name[0]) {
       char *textTableName = strdup(name);
 
-      if (textTableName) return textTableName;
+      if (textTableName)
+      {
+#ifdef _MSC_VER
+          free(name);
+#endif /* _MSC_VER */
+          return textTableName;
+      }
       logMallocError();
     }
+#ifdef _MSC_VER
+    free(name);
+#endif /* _MSC_VER */
   }
 
   return NULL;

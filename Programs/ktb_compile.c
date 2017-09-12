@@ -1392,7 +1392,11 @@ addBindingIndex (
 static int
 addSubbindingIndexes (KeyContext *ctx, const KeyValue *keys, unsigned char count, IncompleteBindingData *ibd) {
   if (count > 1) {
-    KeyValue values[--count];
+#ifdef _MSC_VER
+      KeyValue* values = (KeyValue*)malloc((--count) * sizeof(*values));
+#else /* _MSC_VER */
+      KeyValue values[--count];
+#endif /* _MSC_VER */
     unsigned int index = 0;
 
     copyKeyValues(values, &keys[1], count);
@@ -1404,6 +1408,9 @@ addSubbindingIndexes (KeyContext *ctx, const KeyValue *keys, unsigned char count
       values[index] = keys[index];
       index += 1;
     }
+#ifdef _MSC_VER
+    free(values);
+#endif /* _MSC_VER */
   }
 
   return 1;

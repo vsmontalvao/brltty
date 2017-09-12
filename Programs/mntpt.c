@@ -35,7 +35,9 @@
 #elif defined(USE_PKG_MNTPT_MNTTAB)
 #include "mntpt_mnttab.h"
 #else /* mount point package */
+#ifndef _MSC_VER
 #error mount point package not selected
+#endif /* _MSC_VER */
 #include "mntpt_none.h"
 #endif /* mount point package */
 

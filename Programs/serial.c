@@ -853,7 +853,11 @@ serialGetStream (SerialDevice *serial) {
 #if defined(GRUB_RUNTIME)
     errno = ENOSYS;
 #else /* fdopen() */
+#ifdef _MSC_VER
+    serial->stream = _fdopen(serial->fileDescriptor, "ab+");
+#else /* _MSC_VER */
     serial->stream = fdopen(serial->fileDescriptor, "ab+");
+#endif /* _MSC_VER */
 #endif /* create stdio stream */
 
     if (!serial->stream) {

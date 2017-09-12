@@ -77,13 +77,23 @@ putCharacters (ListGenerationData *lgd, const wchar_t *characters, size_t count)
     if (lgd->list.elementLevel > 0) {
       const unsigned int indent = 2;
       const unsigned int count = indent * lgd->list.elementLevel;
+#ifdef _MSC_VER
+      wchar_t* characters = (wchar_t*)malloc(count * sizeof(*characters));
+#else /* _MSC_VER */
       wchar_t characters[count];
+#endif /* _MSC_VER */
 
       wmemset(characters, WC_C(' '), count);
       characters[count - indent] = lgd->list.elementBullet;
       lgd->list.elementBullet = WC_C(' ');
 
+#ifdef _MSC_VER
+      int addResult = addCharacters(lgd, characters, count);
+      free(characters);
+      if (!addResult) return 0;
+#else /* _MSC_VER */
       if (!addCharacters(lgd, characters, count)) return 0;
+#endif /* _MSC_VER */
     }
   }
 
@@ -103,11 +113,21 @@ putCharacterString (ListGenerationData *lgd, const wchar_t *string) {
 static int
 putUtf8String (ListGenerationData *lgd, const char *string) {
   size_t size = strlen(string) + 1;
+#ifdef _MSC_VER
+  wchar_t* characters = (wchar_t*)malloc(size * sizeof(*characters));
+#else /* _MSC_VER */
   wchar_t characters[size];
+#endif /* _MSC_VER */
   wchar_t *character = characters;
 
   convertUtf8ToWchars(&string, &character, size);
-  return putCharacters(lgd, characters, character-characters);
+#ifdef _MSC_VER
+  int putResult = putCharacters(lgd, characters, character - characters);
+  free(characters);
+  return putResult;
+#else /* _MSC_VER */
+  return putCharacters(lgd, characters, character - characters);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -600,7 +620,11 @@ listKeyBinding (ListGenerationData *lgd, const KeyBinding *binding, int longPres
 
     {
       size_t length = lgd->line.length - keysOffset;
+#ifdef _MSC_VER
+      wchar_t* keys = (wchar_t*)malloc((length + 1) * sizeof(*keys));
+#else /* _MSC_VER */
       wchar_t keys[length + 1];
+#endif /* _MSC_VER */
 
       wmemcpy(keys, &lgd->line.characters[keysOffset], length);
       keys[length] = 0;
@@ -615,6 +639,9 @@ listKeyBinding (ListGenerationData *lgd, const KeyBinding *binding, int longPres
         if (!putCharacterString(lgd, keys)) return 0;
         if (!saveBindingLine(lgd, cmd, keysOffset)) return 0;
       }
+#ifdef _MSC_VER
+      free(keys);
+#endif /* _MSC_VER */
     }
   } else {
     if (!saveBindingLine(lgd, cmd, keysOffset)) return 0;
@@ -770,12 +797,23 @@ internalWriteHeader (const wchar_t *text, unsigned int level, void *data) {
 
   if (level < ARRAY_COUNT(characters)) {
     size_t length = wcslen(text);
+#ifdef _MSC_VER
+    wchar_t* underline = (wchar_t*)malloc((length + 1) * sizeof(*underline));
+#else /* _MSC_VER */
     wchar_t underline[length + 1];
+#endif /* _MSC_VER */
 
     wmemset(underline, characters[level], length);
     underline[length] = 0;
 
+#ifdef _MSC_VER
+    int writeResult = writeLine(lgd, underline);
+    free(underline);
+    if (!writeResult) return 0;
+#else /* _MSC_VER */
     if (!writeLine(lgd, underline)) return 0;
+#endif /* _MSC_VER */
+
     if (!writeBlankLine(lgd)) return 0;
   }
 
@@ -891,11 +929,22 @@ listKeyName (const KeyNameEntry *kne, void *data) {
   const ListKeyNameData *lkn = data;
   const char *name = kne? kne->name: "";
   size_t size = strlen(name) + 1;
+#ifdef _MSC_VER
+  wchar_t* characters = (wchar_t*)malloc(size * sizeof(*characters));
+#else /* _MSC_VER */
   wchar_t characters[size];
+#endif /* _MSC_VER */
   wchar_t *character = characters;
 
   convertUtf8ToWchars(&name, &character, size);
+#ifdef _MSC_VER
+  int writeResult = lkn->writeLine(characters, lkn->data);
+  free(characters);
+  return writeResult;
+#else /* _MSC_VER */
   return lkn->writeLine(characters, lkn->data);
+#endif /* _MSC_VER */
+
 }
 
 int

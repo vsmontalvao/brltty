@@ -226,7 +226,12 @@ awaitCursorMotion (RoutingData *routing, int direction, const CursorAxisEntry *a
       int bestLength = 0;
 
       do {
-        ScreenCharacter buffer[routing->screenColumns];
+#ifdef _MSC_VER
+          ScreenCharacter* buffer = (ScreenCharacter*)malloc((routing->screenColumns) * sizeof(*buffer));
+#else /* _MSC_VER */
+          ScreenCharacter buffer[routing->screenColumns];
+#endif /* _MSC_VER */
+
         if (!readRow(routing, buffer, row)) break;
 
         {
@@ -251,6 +256,10 @@ awaitCursorMotion (RoutingData *routing, int direction, const CursorAxisEntry *a
         }
 
         row -= direction;
+#ifdef _MSC_VER
+        free(buffer);
+#endif /* _MSC_VER */
+
       } while ((row >= 0) && (row < routing->screenRows));
 
       routing->verticalDelta = bestRow - routing->cury;

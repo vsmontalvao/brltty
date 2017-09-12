@@ -314,10 +314,10 @@
 
 ///* Define this if the function tcdrain exists. */
 ///* #undef HAVE_TCDRAIN */
-//
-///* Define this to be a string containing the path to the first serial device. */
-//#define SERIAL_FIRST_DEVICE "COM1"
-//
+
+/* Define this to be a string containing the path to the first serial device. */
+#define SERIAL_FIRST_DEVICE "COM1"
+
 ///* Define only one of the following program path packages. */
 ///* #undef USE_PKG_PGMPATH_NONE */
 ///* #undef USE_PKG_PGMPATH_LINUX */
@@ -563,8 +563,8 @@
 /* Define this to be a string containing the extension for text tables. */
 #define TEXT_TABLE_EXTENSION ".ttb"
 
-///* Define this to be a string containing the extension for text subtables. */
-//#define TEXT_SUBTABLE_EXTENSION ".tti"
+/* Define this to be a string containing the extension for text subtables. */
+#define TEXT_SUBTABLE_EXTENSION ".tti"
 
 /* Define this to be a string containing the extension for attributes tables. */
 #define ATTRIBUTES_TABLE_EXTENSION ".atb"

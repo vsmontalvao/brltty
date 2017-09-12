@@ -727,7 +727,12 @@ asyncExecuteIoCallback (AsyncIoData *iod, long int timeout) {
     prepareMonitors();
 
     if (functionCount) {
-      MonitorEntry monitorArray[functionCount];
+#ifdef _MSC_VER
+        MonitorEntry* monitorArray = (MonitorEntry*)malloc(functionCount * sizeof(*monitorArray));
+#else /* _MSC_VER */
+        MonitorEntry monitorArray[functionCount];
+#endif /* _MSC_VER */
+
       MonitorGroup monitors = {
         .array = monitorArray,
         .count = 0
@@ -771,6 +776,9 @@ asyncExecuteIoCallback (AsyncIoData *iod, long int timeout) {
         }
       }
 
+#ifdef _MSC_VER
+      free(monitorArray);
+#endif /* _MSC_VER */
       return executed;
     }
   }

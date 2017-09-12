@@ -16,6 +16,14 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#ifdef _MSC_VER
+#define DRIVER_CODE wn
+#define DRIVER_NAME Windows
+#define DRIVER_COMMENT ""
+#define DRIVER_VERSION ""
+#define DRIVER_DEVELOPERS ""
+#endif /* _MSC_VER */
+
 #include "prologue.h"
 
 #include "log.h"
@@ -96,7 +104,11 @@ tryToAttach (HWND win) {
   if (!GetWindowThreadProcessId(win, &process))
     return 0;
   FreeConsole();
+#ifdef _MSC_VER
+  if (!AttachConsole(process))
+#else /* _MSC_VER */
   if (!AttachConsoleProc(process))
+#endif /* _MSC_VER */
     return 0;
   closeStdHandles();
   return openStdHandles();
@@ -104,7 +116,11 @@ tryToAttach (HWND win) {
 
 static int
 construct_WindowsScreen (void) {
-  if (followFocus && (AttachConsoleProc || root)) {
+#ifdef _MSC_VER
+    if (followFocus && (AttachConsole || root)) {
+#else /* _MSC_VER */
+    if (followFocus && (AttachConsoleProc || root)) {
+#endif /* _MSC_VER */
     /* disable ^C */
     SetConsoleCtrlHandler(NULL,TRUE);
     if (!FreeConsole() && GetLastError() != ERROR_INVALID_PARAMETER)
@@ -174,11 +190,19 @@ currentVirtualTerminal_WindowsScreen (void) {
 
   if (!(win = GetForegroundWindow())) win = INVALID_HANDLE_VALUE;
 
+#ifdef _MSC_VER
+  if (!AttachConsole && root) {
+#else /* _MSC_VER */
   if (!AttachConsoleProc && root) {
+#endif /* _MSC_VER */
     unreadable = "root BRLTTY";
   } else if (win == INVALID_HANDLE_VALUE) {
     unreadable = "no foreground window";
+#ifdef _MSC_VER
+  } else if (followFocus && AttachConsole && !tryToAttach(win)) {
+#else /* _MSC_VER */
   } else if (followFocus && AttachConsoleProc && !tryToAttach(win)) {
+#endif /* _MSC_VER */
     unreadable = "no attachable console";
   } else if (consoleOutput == INVALID_HANDLE_VALUE) {
     unreadable = "can't open console output";
@@ -226,7 +250,6 @@ readCharacters_WindowsScreen (const ScreenBox *box, ScreenCharacter *buffer) {
   static int wide;
   COORD coord;
 
-  BOOL WINAPI (*fun) (HANDLE, void*, DWORD, COORD, LPDWORD);
   const char *name;
   size_t size;
   void *buf;
@@ -261,12 +284,29 @@ readCharacters_WindowsScreen (const ScreenBox *box, ScreenCharacter *buffer) {
       }
     }
   }
+#ifdef _MSC_VER
+  BOOL(*fun) (HANDLE, void*, DWORD, COORD, LPDWORD);
+  if (wide > 0)
+  {
+      fun = (wchar_t) ReadConsoleOutputCharacterW;
+      size = sizeof(wchar_t);
+      name = ReadConsoleOutputCharacterW;
+  }
+  else
+  {
+      fun = (char) ReadConsoleOutputCharacterA;
+      size = sizeof(char);
+      name = ReadConsoleOutputCharacterA;
+  }
+#else /* _MSC_VER */
+  BOOL WINAPI(*fun) (HANDLE, void*, DWORD, COORD, LPDWORD);
 #define USE(f, t) (fun = (typeof(fun))f, name = #f, size = sizeof(t))
   if (wide > 0)
-    USE(ReadConsoleOutputCharacterW, wchar_t);
+      USE(ReadConsoleOutputCharacterW, wchar_t);
   else
-    USE(ReadConsoleOutputCharacterA, char);
+      USE(ReadConsoleOutputCharacterA, char);
 #undef USE
+#endif /* _MSC_VER */
 
   if (!(buf = malloc(box->width*size))) {
     logSystemError("malloc for Windows console reading");

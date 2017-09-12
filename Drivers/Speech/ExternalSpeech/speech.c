@@ -111,7 +111,11 @@ static void mywrite(volatile SpeechSynthesizer *spk, int fd, const void *buf, in
   if(fd<0) return;
   startTimePeriod(&period, 2000);
   do {
-    if((w = write(fd, pos, len)) < 0) {
+#ifdef _MSC_VER
+      if ((w = _write(fd, pos, len)) < 0) {
+#else /* _MSC_VER */
+      if ((w = write(fd, pos, len)) < 0) {
+#endif /* _MSC_VER */
       if(errno == EINTR || errno == EAGAIN) continue;
       else if(errno == EPIPE)
 	myerror(spk, "ExternalSpeech: pipe to helper program was broken");
@@ -340,9 +344,15 @@ static void spk_destruct (volatile SpeechSynthesizer *spk)
   if(trackHandle)
     asyncCancelRequest(trackHandle);
   if(helper_fd_in >= 0)
-    close(helper_fd_in);
-  if(helper_fd_out >= 0)
-    close(helper_fd_out);
+#ifdef _MSC_VER
+      _close(helper_fd_in);
+  if (helper_fd_out >= 0)
+      _close(helper_fd_out);
+#else /* _MSC_VER */
+      close(helper_fd_in);
+  if (helper_fd_out >= 0)
+      close(helper_fd_out);
+#endif /* _MSC_VER */
   helper_fd_in = helper_fd_out = -1;
   trackHandle = NULL;
 }

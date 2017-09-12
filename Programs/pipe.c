@@ -71,7 +71,11 @@ deallocateHostPath (NamedPipeObject *obj) {
 
 static void
 removePipe (NamedPipeObject *obj) {
-  unlink(obj->host.path);
+#ifdef _MSC_VER
+    _unlink(obj->host.path);
+#else /* _MSC_VER */
+    unlink(obj->host.path);
+#endif /* _MSC_VER */
 }
 
 static void

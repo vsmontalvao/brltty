@@ -208,7 +208,14 @@ pcmTone (NoteDevice *device, unsigned int duration, NoteFrequency frequency) {
 
      * extraSamples = missingSteps / stepsPerSample
      */
+#ifdef _MSC_VER
+    const long long int stepsPerWave = 1 << 32;
+    const long long int partialSteps = (sampleCount * stepsPerSample) % stepsPerWave;
+    const uint32_t missingSteps = (uint32_t)-partialSteps;
+    sampleCount += (missingSteps / stepsPerSample);
+#else /* _MSC_VER */
     sampleCount += (uint32_t)(sampleCount * -stepsPerSample) / stepsPerSample;
+#endif /* _MSC_VER */
 
     while (sampleCount > 0) {
       /* Convert the current 32-bit unsigned linear value to a 31-bit

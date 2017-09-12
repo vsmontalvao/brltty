@@ -110,7 +110,11 @@ newRenderedMenuItem (Menu *menu) {
 
   {
     size_t maximumLength = labelLength + settingLength;
+#ifdef _MSC_VER
+    wchar_t* characters = (wchar_t*)malloc(maximumLength * sizeof(*characters));
+#else /* _MSC_VER */
     wchar_t characters[maximumLength];
+#endif /* _MSC_VER */
 
     size_t settingIndent;
     size_t actualLength;
@@ -142,6 +146,9 @@ newRenderedMenuItem (Menu *menu) {
         logMallocError();
       }
     }
+#ifdef _MSC_VER
+    free(characters);
+#endif /* _MSC_VER */
   }
 
   return NULL;

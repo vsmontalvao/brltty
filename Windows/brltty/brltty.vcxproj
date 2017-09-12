@@ -85,7 +85,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)..\brltty;$(SolutionDir)..\..;$(SolutionDir)..\..\Headers;$(SolutionDir)..\..\Programs</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;__MINGW32__;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;HAVE_STRING_H;HAVE_SDKDDKVER_H;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_PKG_HOSTCMD_WINDOWS;USE_PKG_SERIAL_WINDOWS;HAVE_GETADDRINFO;HAVE_CONFIG_H;__MINGW32__;_WINSOCK_DEPRECATED_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;HAVE_STRING_H;HAVE_SDKDDKVER_H;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>

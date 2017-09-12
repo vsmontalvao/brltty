@@ -279,10 +279,14 @@ getVariableValue (const Variable *variable, const wchar_t **characters, int *len
 int
 setStringVariable (VariableNestingLevel *vnl, const char *name, const char *value) {
   size_t nameLength = getUtf8Length(name);
-  wchar_t nameBuffer[nameLength + 1];
-
   size_t valueLength = getUtf8Length(value);
+#ifdef _MSC_VER
+  wchar_t* nameBuffer = (wchar_t*)malloc((nameLength + 1) * sizeof(*nameBuffer));
+  wchar_t* valueBuffer = (wchar_t*)malloc((valueLength + 1) * sizeof(*valueBuffer));
+#else /* _MSC_VER */
+  wchar_t nameBuffer[nameLength + 1];
   wchar_t valueBuffer[valueLength + 1];
+#endif /* _MSC_VER */
 
   {
     const char *utf8 = name;
@@ -300,9 +304,17 @@ setStringVariable (VariableNestingLevel *vnl, const char *name, const char *valu
 
   if (variable) {
     if (setVariable(variable, valueBuffer, valueLength)) {
+#ifdef _MSC_VER
+      free(nameBuffer);
+      free(valueBuffer);
+#endif /* _MSC_VER */
       return 1;
     }
   }
+#ifdef _MSC_VER
+  free(nameBuffer);
+  free(valueBuffer);
+#endif /* _MSC_VER */
 
   return 0;
 }

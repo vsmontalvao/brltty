@@ -324,8 +324,14 @@ contractText (
 
     {
       const size_t size = getInputCount(&bcd);
+#ifdef _MSC_VER
+      wchar_t* buffer = (wchar_t*)malloc(size * sizeof(*buffer));
+      unsigned int* map = (unsigned int*)malloc((size + 1) * sizeof(*map));
+#else /* _MSC_VER */
       wchar_t buffer[size];
       unsigned int map[size + 1];
+#endif /* _MSC_VER */
+
       size_t length;
 
       if (normalizeText(&bcd, bcd.input.begin, bcd.input.end, buffer, &length, map)) {
@@ -375,6 +381,10 @@ contractText (
       } else {
         contracted = contractionTable->translationMethods->contractText(&bcd);
       }
+#ifdef _MSC_VER
+      free(buffer);
+      free(map);
+#endif /* _MSC_VER */
     }
 
     if (!contracted) {

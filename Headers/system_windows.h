@@ -25,12 +25,23 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#ifdef _MSC_VER
+#ifndef STATUS_SUCCESS
+#include <ntstatus.h>
+#endif /* STATUS_SUCCESS */
+
+#ifndef LOCALE_NAME_USER_DEFAULT
+#define LOCALE_NAME_USER_DEFAULT NULL
+#endif /* LOCALE_NAME_USER_DEFAULT */
+
+#ifndef LOCALE_SNAME
+#define LOCALE_SNAME 0X5CL
+#endif /* LOCALE_SNAME */
+#else /* _MSC_VER */
 #define WIN_PROC_STUB(name) typeof(name) (*name##Proc)
 
-#ifndef _MSC_VER
 /* ntdll.dll */
 #include <ntdef.h>
-#endif /* _MSC_VER */
 
 #ifndef STATUS_SUCCESS
 #include <ntstatus.h>
@@ -85,6 +96,7 @@ extern char *getWindowsLocaleName (void);
 
 
 extern char *makeWindowsCommandLine (const char *const *arguments);
+#endif /* _MSC_VER */
 
 #ifdef __cplusplus
 }

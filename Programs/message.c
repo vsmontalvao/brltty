@@ -141,12 +141,19 @@ ASYNC_TASK_CALLBACK(presentMessage) {
     };
 
     const size_t characterCount = getTextLength(mgp->text);
+    const size_t brailleSize = textCount * brl.textRows;
+
+#ifdef _MSC_VER
+    MessageSegment* messageSegments = (MessageSegment*)malloc(characterCount * sizeof(*messageSegments));
+    wchar_t* characters = (wchar_t*)malloc((characterCount + 1) * sizeof(*characters));
+    wchar_t* brailleBuffer = (wchar_t*)malloc(brailleSize * sizeof(*brailleBuffer));
+#else /* _MSC_VER */
     MessageSegment messageSegments[characterCount];
     wchar_t characters[characterCount + 1];
+    wchar_t brailleBuffer[brailleSize];
+#endif /* _MSC_VER */
     convertTextToWchars(characters, mgp->text, ARRAY_COUNT(characters));
 
-    const size_t brailleSize = textCount * brl.textRows;
-    wchar_t brailleBuffer[brailleSize];
 
     {
       const wchar_t *character = characters;
@@ -219,7 +226,13 @@ ASYNC_TASK_CALLBACK(presentMessage) {
       }
     }
 
-  DONE:
+DONE:
+#ifdef _MSC_VER
+    free(messageSegments);
+    free(characters);
+    free(brailleBuffer);
+#endif /* _MSC_VER */
+
     popCommandEnvironment();
     resumeUpdates(1);
     if (wasLinked) api.link();

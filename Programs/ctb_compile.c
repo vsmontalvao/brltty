@@ -156,7 +156,11 @@ saveCharacterTable (ContractionTableData *ctd) {
   if (!ctd->characterEntryCount) return 1;
   if (!saveDataItem(ctd->area, &offset, ctd->characterTable,
                     ctd->characterEntryCount * sizeof(ctd->characterTable[0]),
-                    __alignof__(ctd->characterTable[0])))
+#ifdef _MSC_VER
+      alignof(ctd->characterTable[0])))
+#else /* _MSC_VER */
+      __alignof__(ctd->characterTable[0])))
+#endif /* _MSC_VER */
     return 0;
 
   {
@@ -854,12 +858,21 @@ makeContractionTablePath (const char *directory, const char *name) {
 
     if (file) {
       if (qualifierLength) {
-        char buffer[qualifierLength + strlen(file) + 1];
+#ifdef _MSC_VER
+          char* buffer = (char*)malloc((qualifierLength + strlen(file) + 1) * sizeof(*buffer));
+#else /* _MSC_VER */
+          char buffer[qualifierLength + strlen(file) + 1];
+#endif /* _MSC_VER */
+
         snprintf(buffer, sizeof(buffer), "%.*s%s",
                  qualifierLength, qualifier, file);
 
         free(file);
         if (!(file = strdup(buffer))) logMallocError();
+#ifdef _MSC_VER
+        free(buffer);
+#endif /* _MSC_VER */
+
       }
 
       if (file) return file;

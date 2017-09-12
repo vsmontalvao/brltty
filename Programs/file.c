@@ -136,7 +136,12 @@ char *
 joinPath (const char *const *components, unsigned int count) {
   const char *const *component = components + count;
   unsigned int size = (count * 2) - 1;
+#ifdef _MSC_VER
+  char* strings = (char*)malloc(size * sizeof(*strings));
+#else /* _MSC_VER */
   const char *strings[size];
+#endif /* _MSC_VER */
+
   unsigned int first = size;
 
   while (component != components) {
@@ -152,7 +157,13 @@ joinPath (const char *const *components, unsigned int count) {
     }
   }
 
-  return joinStrings(&strings[first], size-first);
+#ifdef _MSC_VER
+  int joinResult = joinStrings(&strings[first], size - first);
+  free(strings);
+  return joinResult;
+#else /* _MSC_VER */
+  return joinStrings(&strings[first], size - first);
+#endif /* _MSC_VER */
 }
 
 char *

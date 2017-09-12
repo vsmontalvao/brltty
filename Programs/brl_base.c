@@ -147,7 +147,12 @@ applyBrailleDisplayOrientation (unsigned char *cells, size_t count) {
       const unsigned char *source = cells;
       const unsigned char *end = source + count;
 
+#ifdef _MSC_VER
+      unsigned char* buffer = (unsigned char*)malloc(count * sizeof(*buffer));
+#else /* _MSC_VER */
       unsigned char buffer[count];
+#endif /* _MSC_VER */
+
       unsigned char *target = &buffer[count];
 
       if (!rotateTable[1]) {
@@ -156,6 +161,9 @@ applyBrailleDisplayOrientation (unsigned char *cells, size_t count) {
 
       while (source < end) *--target = rotateTable[*source++];
       memcpy(cells, buffer, count);
+#ifdef _MSC_VER
+      free(buffer);
+#endif /* _MSC_VER */
       break;
     }
 
@@ -643,7 +651,12 @@ enqueueUpdatedKeyGroup (
   unsigned char *old,
   KeyGroup group
 ) {
-  KeyNumber pressStack[count];
+#ifdef _MSC_VER
+    KeyNumber* pressStack = (KeyNumber*)malloc(count * sizeof(*pressStack));
+#else /* _MSC_VER */
+    KeyNumber pressStack[count];
+#endif /* _MSC_VER */
+
   unsigned char pressCount = 0;
   KeyNumber base = 0;
 
@@ -676,6 +689,9 @@ enqueueUpdatedKeyGroup (
     enqueueKeyEvent(brl, group, pressStack[--pressCount], 1);
   }
 
+#ifdef _MSC_VER
+  free(pressStack);
+#endif /* _MSC_VER */
   return 1;
 }
 

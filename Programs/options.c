@@ -20,7 +20,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef _MSC_VER
+int opterr = 1;
+int optind = 1;
+int optopt = '?';
+char* optarg;
+#else /* _MSC_VER */
 #include <strings.h>
+#endif /* _MSC_VER */
 #include <ctype.h>
 #include <errno.h>
 
@@ -115,7 +122,11 @@ printHelp (
   const char *argumentsSummary,
   int all
 ) {
-  char line[lineWidth+1];
+#ifdef _MSC_VER
+  char* line = (char*)malloc((lineWidth + 1) * sizeof(*line));
+#else /* _MSC_VER */
+  char line[lineWidth + 1];
+#endif /* _MSC_VER */
   unsigned int wordWidth = 0;
   unsigned int argumentWidth = 0;
 
@@ -199,7 +210,11 @@ printHelp (
       if (formatStrings? !!option->strings.format: !!option->strings.array) {
         unsigned int index = 0;
         const unsigned int limit = 4;
+#ifdef _MSC_VER
+        const char** strings = (const char**)malloc(limit * sizeof(*strings));
+#else /* _MSC_VER */
         const char *strings[limit];
+#endif /* _MSC_VER */
 
         while (index < limit) {
           const char *string;
@@ -225,6 +240,10 @@ printHelp (
         snprintf(from, (to - from),
                  description, strings[0], strings[1], strings[2], strings[3]);
         description = from;
+#ifdef _MSC_VER
+        free(strings);
+#endif /* _MSC_VER */
+
       }
 
       {
@@ -271,6 +290,9 @@ printHelp (
       }
     }
   }
+#ifdef _MSC_VER
+  free(line);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -294,7 +316,11 @@ processCommandLine (
   int optHelp = 0;
   int optHelpAll = 0;
   const OptionEntry *optionEntries[0X100];
+#ifdef _MSC_VER
+  char* shortOptions = (char*)malloc((1 + (info->optionCount * 2) + 1) * sizeof(*shortOptions));
+#else /* _MSC_VER */
   char shortOptions[1 + (info->optionCount * 2) + 1];
+#endif /* _MSC_VER */
 
 #ifdef HAVE_GETOPT_LONG
   struct option longOptions[(info->optionCount * 2) + 1];
@@ -567,6 +593,9 @@ processCommandLine (
     }
   }
 #endif /* HAVE_GETOPT_LONG */
+#ifdef _MSC_VER
+  free(shortOptions);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -623,7 +652,11 @@ processEnvironmentVariable (
 
   if ((option->flags & OPT_Environ) && option->word) {
     size_t nameSize = prefixLength + 1 + strlen(option->word) + 1;
+#ifdef _MSC_VER
+    char* name = (char*)malloc(nameSize * sizeof(*name));
+#else /* _MSC_VER */
     char name[nameSize];
+#endif /* _MSC_VER */
 
     snprintf(name, nameSize, "%s_%s", prefix, option->word);
 
@@ -650,6 +683,9 @@ processEnvironmentVariable (
         }
       }
     }
+#ifdef _MSC_VER
+    free(name);
+#endif /* _MSC_VER */
   }
 
   return 1;
@@ -806,7 +842,11 @@ static DATA_OPERANDS_PROCESSOR(processConfigurationOperands) {
 
 static DATA_CONDITION_TESTER(testConfigurationDirectiveSet) {
   const ConfigurationFileProcessingData *conf = data;
+#ifdef _MSC_VER
+  wchar_t* keyword = (wchar_t*)malloc((identifier->length + 1) * sizeof(*keyword));
+#else /* _MSC_VER */
   wchar_t keyword[identifier->length + 1];
+#endif /* _MSC_VER */
 
   wmemcpy(keyword, identifier->characters, identifier->length);
   keyword[identifier->length] = 0;
@@ -900,8 +940,13 @@ processConfigurationFile (
     FILE *file = openDataFile(path, "r", optional);
 
     if (file) {
+#ifdef _MSC_VER
+      char* settings = (char*)malloc((info->optionCount) * sizeof(*settings));
+      ConfigurationDirective** directives = (ConfigurationDirective**)malloc((info->optionCount) * sizeof(*directives));
+#else /* _MSC_VER */
       char *settings[info->optionCount];
       ConfigurationDirective *directives[info->optionCount];
+#endif /* _MSC_VER */
 
       ConfigurationFileProcessingData conf = {
         .info = info,

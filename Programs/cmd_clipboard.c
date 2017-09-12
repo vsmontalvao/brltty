@@ -170,10 +170,19 @@ cpbReadScreen (ClipboardCommandData *ccd, size_t *length, int fromColumn, int fr
   int rows = toRow - fromRow + 1;
 
   if ((columns >= 1) && (rows >= 1) && (ccd->begin.offset >= 0)) {
-    wchar_t fromBuffer[rows * columns];
+#ifdef _MSC_VER
+      wchar_t* fromBuffer = (wchar_t*)malloc((rows * columns) * sizeof(*fromBuffer));
+#else /* _MSC_VER */
+      wchar_t fromBuffer[rows * columns];
+#endif /* _MSC_VER */
 
     if (readScreenText(fromColumn, fromRow, columns, rows, fromBuffer)) {
-      wchar_t toBuffer[rows * (columns + 1)];
+#ifdef _MSC_VER
+        wchar_t* toBuffer = (wchar_t*)malloc((rows * (columns + 1)) * sizeof(*toBuffer));
+#else /* _MSC_VER */
+        wchar_t toBuffer[rows * (columns + 1)];
+#endif /* _MSC_VER */
+
       wchar_t *toAddress = toBuffer;
 
       const wchar_t *fromAddress = fromBuffer;
@@ -199,7 +208,13 @@ cpbReadScreen (ClipboardCommandData *ccd, size_t *length, int fromColumn, int fr
           wmemcpy(newBuffer, toBuffer, (*length = newLength));
         }
       }
+#ifdef _MSC_VER
+      free(toBuffer);
+#endif /* _MSC_VER */
     }
+#ifdef _MSC_VER
+    free(fromBuffer);
+#endif /* _MSC_VER */
   }
 
   return newBuffer;
@@ -426,7 +441,12 @@ cpbRestore (ClipboardCommandData *ccd) {
 
   if (stream) {
     size_t size = 0X1000;
+#ifdef _MSC_VER
+    char* buffer = (char*)malloc(size * sizeof(*buffer));
+#else /* _MSC_VER */
     char buffer[size];
+#endif /* _MSC_VER */
+
     size_t length = 0;
 
     cpbClearContent(ccd);
@@ -475,6 +495,9 @@ cpbRestore (ClipboardCommandData *ccd) {
       logSystemError("fclose");
       ok = 0;
     }
+#ifdef _MSC_VER
+    free(buffer);
+#endif /* _MSC_VER */
   }
 
   return ok;
@@ -540,9 +563,13 @@ handleClipboardCommands (int command, void *data) {
 
         if (count <= scr.cols) {
           int line = ses->winy;
+#ifdef _MSC_VER
+          wchar_t* buffer = (wchar_t*)malloc((scr.cols) * sizeof(*buffer));
+          wchar_t* characters = (wchar_t*)malloc(count * sizeof(*characters));
+#else /* _MSC_VER */
           wchar_t buffer[scr.cols];
           wchar_t characters[count];
-
+#endif /* _MSC_VER */
           {
             unsigned int i;
             for (i=0; i<count; i+=1) characters[i] = towlower(cpbBuffer[i]);
@@ -581,6 +608,10 @@ handleClipboardCommands (int command, void *data) {
             }
             line += increment;
           }
+#ifdef _MSC_VER
+          free(buffer);
+          free(characters);
+#endif /* _MSC_VER */
         }
 
         if (!found) alert(ALERT_BOUNCE);

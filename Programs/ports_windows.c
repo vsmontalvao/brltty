@@ -27,9 +27,15 @@ static int portsEnabled = 0;
 
 int
 enablePorts (int errorLevel, unsigned short int base, unsigned short int count) {
-  if (!portsEnabled && NtSetInformationProcessProc) {
-    ULONG Iopl=3;
-    if (NtSetInformationProcessProc(GetCurrentProcess(), ProcessUserModeIOPL,
+#ifdef _MSC_VER
+    if (!portsEnabled) {
+        ULONG Iopl = 3;
+        if (NtSetInformationProcess(GetCurrentProcess(), ProcessMemoryPriority,
+#else /* _MSC_VER */
+    if (!portsEnabled && NtSetInformationProcessProc) {
+        ULONG Iopl = 3;
+        if (NtSetInformationProcessProc(GetCurrentProcess(), ProcessUserModeIOPL,
+#endif /* _MSC_VER */
                                 &Iopl, sizeof(Iopl)) != STATUS_SUCCESS) {
       return 0;
     }

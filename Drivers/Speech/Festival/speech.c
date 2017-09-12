@@ -33,7 +33,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifndef _MSC_VER
 #include <strings.h>
+#endif /* _MSC_VER */
 #include <ctype.h>
 
 #include "log.h"

@@ -353,7 +353,11 @@ fillStatusSeparator (wchar_t *text, unsigned char *dots) {
 
 int
 writeBrailleCharacters (const char *mode, const wchar_t *characters, size_t length) {
-  wchar_t textBuffer[brl.textColumns * brl.textRows];
+#ifdef _MSC_VER
+    wchar_t* textBuffer = (wchar_t*)malloc((brl.textColumns * brl.textRows) * sizeof(*textBuffer));
+#else /* _MSC_VER */
+    wchar_t textBuffer[brl.textColumns * brl.textRows];
+#endif /* _MSC_VER */
 
   fillTextRegion(textBuffer, brl.buffer,
                  textStart, textCount, brl.textColumns, brl.textRows,
@@ -361,24 +365,50 @@ writeBrailleCharacters (const char *mode, const wchar_t *characters, size_t leng
 
   {
     size_t modeLength = mode? getUtf8Length(mode): 0;
+#ifdef _MSC_VER
+    wchar_t* modeCharacters = (wchar_t*)malloc((modeLength + 1) * sizeof(*modeCharacters));
+#else /* _MSC_VER */
     wchar_t modeCharacters[modeLength + 1];
+#endif /* _MSC_VER */
+
     convertTextToWchars(modeCharacters, mode, ARRAY_COUNT(modeCharacters));
     fillTextRegion(textBuffer, brl.buffer,
                    statusStart, statusCount, brl.textColumns, brl.textRows,
                    modeCharacters, modeLength);
+#ifdef _MSC_VER
+    free(modeCharacters);
+#endif /* _MSC_VER */
   }
 
   fillStatusSeparator(textBuffer, brl.buffer);
 
+#ifdef _MSC_VER
+  int writeResult = writeBrailleWindow(&brl, textBuffer);
+  free(textBuffer);
+  return writeResult;
+#else /* _MSC_VER */
   return writeBrailleWindow(&brl, textBuffer);
+#endif /* _MSC_VER */
 }
 
 int
 writeBrailleText (const char *mode, const char *text) {
   size_t count = getTextLength(text) + 1;
+#ifdef _MSC_VER
+  wchar_t* characters = (wchar_t*)malloc(count * sizeof(*characters));
+#else /* _MSC_VER */
   wchar_t characters[count];
+#endif /* _MSC_VER */
+
   size_t length = convertTextToWchars(characters, text, count);
+#ifdef _MSC_VER
+  int writeResult = writeBrailleCharacters(mode, characters, length);
+  free(characters);
+  return writeResult;
+#else /* _MSC_VER */
   return writeBrailleCharacters(mode, characters, length);
+#endif /* _MSC_VER */
+
 }
 
 int
@@ -1158,9 +1188,20 @@ int
 showDotPattern (unsigned char dots, unsigned char duration) {
   if (braille->writeStatus && (brl.statusColumns > 0)) {
     unsigned int length = brl.statusColumns * brl.statusRows;
+#ifdef _MSC_VER
+    unsigned char* cells = (unsigned char*)malloc(length * sizeof(*cells));
+#else /* _MSC_VER */
     unsigned char cells[length];        /* status cell buffer */
+#endif /* _MSC_VER */
+
     memset(cells, dots, length);
+#ifdef _MSC_VER
+    int writeResult = braille->writeStatus(&brl, cells);
+    free(cells);
+    if (!writeResult) return 0;
+#else /* _MSC_VER */
     if (!braille->writeStatus(&brl, cells)) return 0;
+#endif /* _MSC_VER */
   }
 
   memset(brl.buffer, dots, brl.textColumns*brl.textRows);

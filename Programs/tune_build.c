@@ -540,34 +540,52 @@ int
 parseTuneText (TuneBuilder *tb, const wchar_t *text) {
   tb->source.text = text;
 
+#ifdef _MSC_VER
+  wchar_t* buffer = (wchar_t*)malloc((wcslen(text) + 1) * sizeof(*buffer));
+#else /* _MSC_VER */
   wchar_t buffer[wcslen(text) + 1];
+#endif /* _MSC_VER */
+
   wcscpy(buffer, text);
 
   static const wchar_t *delimiters = WS_C(" \t\r\n");
   wchar_t *string = buffer;
   wchar_t *operand;
 
-#if !defined(__MINGW32__) && !defined(__MSDOS__)
+#if defined(_MSC_VER) || (!defined(__MINGW32__) && !defined(__MSDOS__))
   wchar_t *next;
 #endif /* __MINGW32__ */
 
   while ((operand = wcstok(string, delimiters
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) || defined(_MSC_VER)
                            , &next
 #endif /* __MINGW32__ */
                           ))) {
     if (*operand == '#') break;
-    if (!parseTuneOperand(tb, operand)) return 0;
+    if (!parseTuneOperand(tb, operand))
+    {
+#ifdef _MSC_VER
+        free(buffer);
+#endif /* _MSC_VER */
+        return 0;
+    }
     string = NULL;
   }
 
+#ifdef _MSC_VER
+  free(buffer);
+#endif /* _MSC_VER */
   return 1;
 }
 
 int
 parseTuneString (TuneBuilder *tb, const char *string) {
   const size_t size = strlen(string) + 1;
+#ifdef _MSC_VER
+  wchar_t* characters = (wchar_t*)malloc(size * sizeof(*characters));
+#else /* _MSC_VER */
   wchar_t characters[size];
+#endif /* _MSC_VER */
 
   const char *byte = string;
   wchar_t *character = characters;

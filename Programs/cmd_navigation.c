@@ -61,14 +61,24 @@ toDifferentLine (
   int amount, int from, int width
 ) {
   if (canMoveWindow()) {
-    ScreenCharacter characters1[width];
+#ifdef _MSC_VER
+      ScreenCharacter* characters1 = (ScreenCharacter*)malloc(width * sizeof(*characters1));
+#else /* _MSC_VER */
+      ScreenCharacter characters1[width];
+#endif /* _MSC_VER */
+
     unsigned int skipped = 0;
 
     if ((isSameCharacter == isSameText) && ses->displayMode) isSameCharacter = isSameAttributes;
     readScreen(from, ses->winy, width, 1, characters1);
 
     do {
-      ScreenCharacter characters2[width];
+#ifdef _MSC_VER
+        ScreenCharacter* characters2 = (ScreenCharacter*)malloc(width * sizeof(*characters2));
+#else /* _MSC_VER */
+        ScreenCharacter characters2[width];
+#endif /* _MSC_VER */
+
       readScreen(from, ses->winy+=amount, width, 1, characters2);
 
       if (!isSameRow(characters1, characters2, width, isSameCharacter) ||
@@ -79,7 +89,14 @@ toDifferentLine (
 
       /* lines are identical */
       alertLineSkipped(&skipped);
+#ifdef _MSC_VER
+      free(characters2);
+#endif /* _MSC_VER */
     } while (canMoveWindow());
+#ifdef _MSC_VER
+    free(characters1);
+#endif /* _MSC_VER */
+
   }
 
   alert(ALERT_BOUNCE);
@@ -160,13 +177,30 @@ findRow (int column, int increment, RowTester test, void *data) {
 static int
 testIndent (int column, int row, void *data UNUSED) {
   int count = column+1;
+#ifdef _MSC_VER
+  ScreenCharacter* characters = (ScreenCharacter*)malloc(count * sizeof(*characters));
+#else /* _MSC_VER */
   ScreenCharacter characters[count];
+#endif /* _MSC_VER */
+
   readScreenRow(row, count, characters);
   while (column >= 0) {
     wchar_t text = characters[column].text;
+#ifdef _MSC_VER
+    if (text != WC_C(' '))
+    {
+        free(characters);
+        return 1;
+    }
+#else /* _MSC_VER */
     if (text != WC_C(' ')) return 1;
+#endif /* _MSC_VER */
+
     --column;
   }
+#ifdef _MSC_VER
+  free(characters);
+#endif /* _MSC_VER */
   return 0;
 }
 
@@ -174,9 +208,21 @@ static int
 testPrompt (int column, int row, void *data) {
   const ScreenCharacter *prompt = data;
   int count = column+1;
+#ifdef _MSC_VER
+  ScreenCharacter* characters = (ScreenCharacter*)malloc(count * sizeof(*characters));
+#else /* _MSC_VER */
   ScreenCharacter characters[count];
+#endif /* _MSC_VER */
+
   readScreenRow(row, count, characters);
+
+#ifdef _MSC_VER
+  int isSameRowResult = isSameRow(characters, prompt, count, isSameText);
+  free(characters);
+  return isSameRowResult;
+#else /* _MSC_VER */
   return isSameRow(characters, prompt, count, isSameText);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -184,7 +230,12 @@ toPreviousNonblankWindow (void) {
   int oldX = ses->winx;
   int oldY = ses->winy;
   int tuneLimit = 3;
+#ifdef _MSC_VER
+  ScreenCharacter* characters = (ScreenCharacter*)malloc((scr.cols) * sizeof(*characters));
+#else /* _MSC_VER */
   ScreenCharacter characters[scr.cols];
+#endif /* _MSC_VER */
+
 
   while (1) {
     int charCount;
@@ -223,6 +274,9 @@ toPreviousNonblankWindow (void) {
 
     if (charIndex >= 0) break;
   }
+#ifdef _MSC_VER
+  free(characters);
+#endif /* _MSC_VER */
 }
 
 static void
@@ -230,7 +284,11 @@ toNextNonblankWindow (void) {
   int oldX = ses->winx;
   int oldY = ses->winy;
   int tuneLimit = 3;
+#ifdef _MSC_VER
+  ScreenCharacter* characters = (ScreenCharacter*)malloc((scr.cols) * sizeof(*characters));
+#else /* _MSC_VER */
   ScreenCharacter characters[scr.cols];
+#endif /* _MSC_VER */
 
   while (1) {
     int charCount;
@@ -269,6 +327,9 @@ toNextNonblankWindow (void) {
 
     if (charIndex < charCount) break;
   }
+#ifdef _MSC_VER
+  free(characters);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -351,7 +412,12 @@ handleNavigationCommands (int command, void *data) {
       } State;
 
       State state = STARTING;
+#ifdef _MSC_VER
+      ScreenCharacter* characters = (ScreenCharacter*)malloc((scr.cols) * sizeof(*characters));
+#else /* _MSC_VER */
       ScreenCharacter characters[scr.cols];
+#endif /* _MSC_VER */
+
       int line = ses->winy;
 
       while (1) {
@@ -390,13 +456,21 @@ handleNavigationCommands (int command, void *data) {
       } else {
         alert(ALERT_BOUNCE);
       }
+#ifdef _MSC_VER
+      free(characters);
+#endif /* _MSC_VER */
 
       break;
     }
 
     case BRL_CMD_NXPGRPH: {
       int found = 0;
+#ifdef _MSC_VER
+      ScreenCharacter* characters = (ScreenCharacter*)malloc((scr.cols) * sizeof(*characters));
+#else /* _MSC_VER */
       ScreenCharacter characters[scr.cols];
+#endif /* _MSC_VER */
+
       int findBlankLine = 1;
       int line = ses->winy;
 
@@ -417,6 +491,10 @@ handleNavigationCommands (int command, void *data) {
         line += 1;
       }
 
+#ifdef _MSC_VER
+      free(characters);
+#endif /* _MSC_VER */
+
       if (!found) alert(ALERT_BOUNCE);
       break;
     }
@@ -430,7 +508,12 @@ handleNavigationCommands (int command, void *data) {
       increment = 1;
     findPrompt:
       {
-        ScreenCharacter characters[scr.cols];
+#ifdef _MSC_VER
+          ScreenCharacter* characters = (ScreenCharacter*)malloc((scr.cols) * sizeof(*characters));
+#else /* _MSC_VER */
+          ScreenCharacter characters[scr.cols];
+#endif /* _MSC_VER */
+
         size_t length = 0;
         readScreenRow(ses->winy, scr.cols, characters);
         while (length < scr.cols) {
@@ -442,6 +525,10 @@ handleNavigationCommands (int command, void *data) {
         } else {
           alert(ALERT_COMMAND_REJECTED);
         }
+#ifdef _MSC_VER
+        free(characters);
+#endif /* _MSC_VER */
+
       }
       break;
     }
@@ -519,7 +606,11 @@ handleNavigationCommands (int command, void *data) {
                 (scr.posx < 0) ||
                 (scr.posx >= charCount)) {
               int charIndex;
+#ifdef _MSC_VER
+              ScreenCharacter* characters = (ScreenCharacter*)malloc(charCount * sizeof(*characters));
+#else /* _MSC_VER */
               ScreenCharacter characters[charCount];
+#endif /* _MSC_VER */
 
               readScreenRow(ses->winy, charCount, characters);
 
@@ -528,6 +619,9 @@ handleNavigationCommands (int command, void *data) {
 
                 if (text != WC_C(' ')) break;
               }
+#ifdef _MSC_VER
+              free(characters);
+#endif /* _MSC_VER */
 
               if (charIndex == charCount) goto wrapUp;
             }
@@ -551,7 +645,11 @@ handleNavigationCommands (int command, void *data) {
       skipEndOfLine:
         if (skipBlankBrailleWindows && (prefs.skipBlankBrailleWindowsMode == sbwEndOfLine)) {
           int charIndex;
+#ifdef _MSC_VER
+          ScreenCharacter* characters = (ScreenCharacter*)malloc((scr.cols) * sizeof(*characters));
+#else /* _MSC_VER */
           ScreenCharacter characters[scr.cols];
+#endif /* _MSC_VER */
 
           readScreenRow(ses->winy, scr.cols, characters);
 
@@ -566,6 +664,9 @@ handleNavigationCommands (int command, void *data) {
           }
 
           if (charIndex < ses->winx) placeRightEdge(charIndex);
+#ifdef _MSC_VER
+          free(characters);
+#endif /* _MSC_VER */
         }
       }
 
@@ -599,7 +700,11 @@ handleNavigationCommands (int command, void *data) {
                 (scr.posx < ses->winx)) {
               int charCount = scr.cols - ses->winx;
               int charIndex;
+#ifdef _MSC_VER
+              ScreenCharacter* characters = (ScreenCharacter*)malloc(charCount * sizeof(*characters));
+#else /* _MSC_VER */
               ScreenCharacter characters[charCount];
+#endif /* _MSC_VER */
 
               readScreen(ses->winx, ses->winy, charCount, 1, characters);
 
@@ -608,6 +713,9 @@ handleNavigationCommands (int command, void *data) {
 
                 if (text != WC_C(' ')) break;
               }
+#ifdef _MSC_VER
+              free(characters);
+#endif /* _MSC_VER */
 
               if (charIndex == charCount) goto wrapDown;
             }

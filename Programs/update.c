@@ -195,20 +195,43 @@ writeStatusCells (void) {
     unsigned int length = getStatusFieldsLength(fields);
 
     if (length > 0) {
+#ifdef _MSC_VER
+      unsigned char* cells = (unsigned char*)malloc(length * sizeof(*cells));
+#else /* _MSC_VER */
       unsigned char cells[length];        /* status cell buffer */
+#endif /* _MSC_VER */
       unsigned int count = brl.statusColumns * brl.statusRows;
 
       memset(cells, 0, length);
       renderStatusFields(fields, cells);
 
       if (count > length) {
-        unsigned char buffer[count];
+#ifdef _MSC_VER
+          unsigned char* buffer = (unsigned char*)malloc(count * sizeof(*buffer));
+#else /* _MSC_VER */
+          unsigned char buffer[count];
+#endif /* _MSC_VER */
+
         memcpy(buffer, cells, length);
         memset(&buffer[length], 0, count-length);
+#ifdef _MSC_VER
+        int writeResult = braille->writeStatus(&brl, buffer);
+        free(cells);
+        free(buffer);
+        if (!writeResult) return 0;
+#else /* _MSC_VER */
         if (!braille->writeStatus(&brl, buffer)) return 0;
+#endif /* _MSC_VER */
       } else if (!braille->writeStatus(&brl, cells)) {
+#ifdef _MSC_VER
+          free(cells);
+#endif /* _MSC_VER */
         return 0;
       }
+#ifdef _MSC_VER
+      free(cells);
+#endif /* _MSC_VER */
+
     } else if (!clearStatusCells(&brl)) {
       return 0;
     }
@@ -221,7 +244,11 @@ static int
 showInfo (void) {
   const char *mode = "info";
   const size_t size = brl.textColumns * brl.textRows;
+#ifdef _MSC_VER
+  char* text = (char*)malloc((size + 1) * sizeof(*text));
+#else /* _MSC_VER */
   char text[size + 1];
+#endif /* _MSC_VER */
 
   brl.cursor = BRL_NO_CURSOR;
   if (!setStatusText(&brl, mode)) return 0;
@@ -230,12 +257,18 @@ showInfo (void) {
    * are very small, and others (e.g. Bookworm) are even smaller.
    */
   if (size < 21) {
-    wchar_t characters[size];
-    size_t length;
+      size_t length;
+      const int cellCount = 5;
 
-    const int cellCount = 5;
-    unsigned char cells[cellCount];
-    char prefix[cellCount];
+#ifdef _MSC_VER
+      wchar_t* characters = (wchar_t*)malloc(size * sizeof(*characters));
+      unsigned char* cells = (unsigned char*)malloc(cellCount * sizeof(*cells));
+      char* prefix = (char*)malloc(cellCount * sizeof(*prefix));
+#else /* _MSC_VER */
+      wchar_t characters[size];
+      unsigned char cells[cellCount];
+      char prefix[cellCount];
+#endif /* _MSC_VER */
 
     {
       static const unsigned char fields[] = {
@@ -273,7 +306,16 @@ showInfo (void) {
       }
     }
 
+#ifdef _MSC_VER
+    int writeResult = writeBrailleCharacters(mode, characters, length);
+    free(characters);
+    free(cells);
+    free(prefix);
+    free(text);
+    return writeResult;
+#else /* _MSC_VER */
     return writeBrailleCharacters(mode, characters, length);
+#endif /* _MSC_VER */
   }
 
   STR_BEGIN(text, sizeof(text));
@@ -303,7 +345,13 @@ showInfo (void) {
   }
 
   STR_END;
+#ifdef _MSC_VER
+  int writeResult = writeBrailleText(mode, text);
+  free(text);
+  return writeResult;
+#else /* _MSC_VER */
   return writeBrailleText(mode, text);
+#endif /* _MSC_VER */
 }
 
 static int
@@ -343,7 +391,11 @@ checkScreenScroll (int track) {
   int newScreen = scr.number;
   int newWidth = scr.cols;
   size_t newCount = newWidth * rowCount;
+#ifdef _MSC_VER
+  ScreenCharacter* newCharacters = (ScreenCharacter*)malloc(newCount * sizeof(*newCharacters));
+#else /* _MSC_VER */
   ScreenCharacter newCharacters[newCount];
+#endif /* _MSC_VER */
 
   int newRow = ses->winy;
   int newTop = newRow - (rowCount - 1);
@@ -379,6 +431,9 @@ checkScreenScroll (int track) {
     oldRow = ses->winy;
     oldWidth = newWidth;
   }
+#ifdef _MSC_VER
+  free(newCharacters);
+#endif /* _MSC_VER */
 }
 
 #ifdef ENABLE_SPEECH_SUPPORT
@@ -770,7 +825,11 @@ doUpdate (void) {
     } else {
       const unsigned int windowLength = brl.textColumns * brl.textRows;
       const unsigned int textLength = textCount * brl.textRows;
+#ifdef _MSC_VER
+      wchar_t* textBuffer = (wchar_t*)malloc(windowLength * sizeof(*textBuffer));
+#else /* _MSC_VER */
       wchar_t textBuffer[windowLength];
+#endif /* _MSC_VER */
 
       memset(brl.buffer, 0, windowLength);
       wmemset(textBuffer, WC_C(' '), windowLength);
@@ -888,7 +947,11 @@ doUpdate (void) {
 #endif /* ENABLE_CONTRACTED_BRAILLE */
       {
         int windowColumns = MIN(textCount, scr.cols-ses->winx);
+#ifdef _MSC_VER
+        ScreenCharacter* characters = (ScreenCharacter*)malloc(textLength * sizeof(*characters));
+#else /* _MSC_VER */
         ScreenCharacter characters[textLength];
+#endif /* _MSC_VER */
 
         readScreen(ses->winx, ses->winy, windowColumns, brl.textRows, characters);
         if (windowColumns < textCount) {
@@ -955,6 +1018,10 @@ doUpdate (void) {
             }
           }
         }
+#ifdef _MSC_VER
+        free(characters);
+#endif /* _MSC_VER */
+
       }
 
       if ((brl.cursor = getScreenCursorPosition(scr.posx, scr.posy)) != BRL_NO_CURSOR) {
@@ -984,18 +1051,30 @@ doUpdate (void) {
         unsigned int length = getStatusFieldsLength(fields);
 
         if (length > 0) {
-          unsigned char cells[length];
+#ifdef _MSC_VER
+            unsigned char* cells = (unsigned char*)malloc(length * sizeof(*cells));
+#else /* _MSC_VER */
+            unsigned char cells[length];
+#endif /* _MSC_VER */
+
           memset(cells, 0, length);
           renderStatusFields(fields, cells);
           fillDotsRegion(textBuffer, brl.buffer,
                          statusStart, statusCount, brl.textColumns, brl.textRows,
                          cells, length);
+#ifdef _MSC_VER
+          free(cells);
+#endif /* _MSC_VER */
         }
 
         fillStatusSeparator(textBuffer, brl.buffer);
       }
 
       if (!(writeStatusCells() && writeBrailleWindow(&brl, textBuffer))) brl.hasFailed = 1;
+#ifdef _MSC_VER
+      free(textBuffer);
+#endif /* _MSC_VER */
+
     }
 
     api.releaseDriver();

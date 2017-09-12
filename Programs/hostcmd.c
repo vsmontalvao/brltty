@@ -39,7 +39,11 @@ int
 finishHostCommandStream (HostCommandStream *hcs, int fileDescriptor) {
   const char *mode = hcs->isInput? "w": "r";
 
+#ifdef _MSC_VER
+  if ((**hcs->streamVariable = _fdopen(fileDescriptor, mode))) {
+#else /* _MSC_VER */
   if ((**hcs->streamVariable = fdopen(fileDescriptor, mode))) {
+#endif /* _MSC_VER */
     return 1;
   } else {
     logSystemError("fdopen");
