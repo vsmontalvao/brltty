@@ -18,17 +18,27 @@
 
 #ifdef _MSC_VER
 #define __asm__ __asm
-#define __volatile__ __volatile
+#define __volatile__ volatile
 #endif /* _MSC_VER */
 
 unsigned char
 readPort1 (unsigned short int port) {
   unsigned char v;
-  __asm__ __volatile__ ("inb %w1,%0" : "=a" (v) : "Nd" (port));
+#ifdef _MSC_VER
+  v = "TODO";
+  //__asm inb %w1, % 0 : = a[v] : Nd[port];
+#else /* _MSC_VER */
+  __asm__ __volatile__("inb %w1,%0" : "=a" (v) : "Nd" (port));
+#endif /* _MSC_VER */
+
   return v;
 }
 
 void
 writePort1 (unsigned short int port, unsigned char value) {
-  __asm__ __volatile__ ("outb %b0,%w1" : : "a" (value), "Nd" (port));
+#ifdef _MSC_VER
+    //__asm "outb %b0,%w1" : : "a" (value), "Nd" (port);
+#else /* _MSC_VER */
+    __asm__ __volatile__("outb %b0,%w1" : : "a" (value), "Nd" (port));
+#endif /* _MSC_VER */
 }
