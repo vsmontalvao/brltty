@@ -43,3 +43,5 @@ reldeps.mk
 *.xz
 
 /lib/
+
+*.TMP

@@ -1,0 +1,67 @@
+EXPORTS
+    brlapi__acceptKeyRanges @1
+    brlapi__acceptKeys @2
+    brlapi__closeConnection @3
+    brlapi__defaultExceptionHandler @4
+    brlapi__enterRawMode @5
+    brlapi__enterTtyMode @6
+    brlapi__enterTtyModeWithPath @7
+    brlapi__getDisplaySize @8
+    brlapi__getDriverName @9
+    brlapi__getModelIdentifier @10
+    brlapi__ignoreKeyRanges @11
+    brlapi__ignoreKeys @12
+    brlapi__leaveRawMode @13
+    brlapi__leaveTtyMode @14
+    brlapi__openConnection @15
+    brlapi__readKey @16
+    brlapi__recvRaw @17
+    brlapi__resumeDriver @18
+    brlapi__sendRaw @19
+    brlapi__setExceptionHandler @20
+    brlapi__setFocus @21
+    brlapi__strexception @22
+    brlapi__suspendDriver @23
+    brlapi__writeDots @24
+    brlapi__writeTextWin @25
+    brlapi__writeWin @26
+    brlapi_acceptKeyRanges @27
+    brlapi_acceptKeys @28
+    brlapi_closeConnection @29
+    brlapi_defaultExceptionHandler @30
+    brlapi_describeKeyCode @31
+    brlapi_enterRawMode @32
+    brlapi_enterTtyMode @33
+    brlapi_enterTtyModeWithPath @34
+    brlapi_errlist @35 DATA
+    brlapi_error @36 DATA
+    brlapi_error_location @37
+    brlapi_expandKeyCode @38
+    brlapi_getDisplaySize @39
+    brlapi_getDriverName @40
+    brlapi_getHandleSize @41
+    brlapi_getModelIdentifier @42
+    brlapi_getPacketTypeName @43
+    brlapi_ignoreKeyRanges @44
+    brlapi_ignoreKeys @45
+    brlapi_leaveRawMode @46
+    brlapi_leaveTtyMode @47
+    brlapi_nerr @48 DATA
+    brlapi_openConnection @49
+    brlapi_perror @50
+    brlapi_readKey @51
+    brlapi_readPacket @52
+    brlapi_readPacketContent @53
+    brlapi_readPacketHeader @54
+    brlapi_recvRaw @55
+    brlapi_resumeDriver @56
+    brlapi_sendRaw @57
+    brlapi_setExceptionHandler @58
+    brlapi_setFocus @59
+    brlapi_strerror @60
+    brlapi_strexception @61
+    brlapi_suspendDriver @62
+    brlapi_writeDots @63
+    brlapi_writePacket
+    brlapi_writeTextWin @65
+    brlapi_writeWin @66

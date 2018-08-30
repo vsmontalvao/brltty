@@ -16,6 +16,7 @@
  * This software is maintained by Dave Mielke <dave@mielke.cc>.
  */
 
+#include <winerror.h>
 #include <errno.h>
 
 WIN_ERRNO_STORAGE_CLASS int
